@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SafeStore V2.1 - Análisis Automático</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SafeStore V2 - Análisis Automático</title>
 <link rel="icon" href="https://files.catbox.moe/bsim07.jpeg">
 <style>
 :root{--blue:#0F2C61;--blue2:#1E4BD8;--light:#F1F5F9}
@@ -16,11 +15,8 @@ body{font-family:apple-system,sans-serif;background:var(--light)}
 .tab{display:flex;gap:8px;margin-bottom:14px}
 .tab button{flex:1;padding:12px;border-radius:10px;border:1.5px solid #BFDBFE;background:#EFF6FF;font-weight:800;cursor:pointer}
 .tab button.active{background:var(--blue);color:#fff;border-color:var(--blue)}
-.inpWrap{position:relative;margin-bottom:10px}
-.input{width:100%;padding:14px 42px 14px 14px;border-radius:12px;border:2px solid #BFDBFE;font-size:15px;outline:none}
-.input:focus{border-color:var(--blue2)}
-.clearBtn{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;border:0;background:#E2E8F0;color:#475569;font-weight:900;cursor:pointer;display:none;align-items:center;justify-content:center}
-.autoBox{background:#F8FAFC;border:1px dashed #93C5FD;border-radius:12px;padding:12px;margin:10px 0;font-size:12px;display:none;line-height:1.6}
+.input{width:100%;padding:14px;border-radius:12px;border:2px solid #BFDBFE;font-size:15px;margin-bottom:8px}
+.autoBox{background:#F8FAFC;border:1px dashed #93C5FD;border-radius:12px;padding:12px;margin:10px 0;font-size:12px;display:none}
 .checks{display:grid;gap:8px;margin-top:10px}
 .checks label{display:flex;gap:10px;padding:11px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;font-size:13px}
 .btn{width:100%;margin-top:14px;padding:14px;border-radius:12px;background:var(--blue);color:#fff;font-weight:800;border:0;cursor:pointer}
@@ -29,46 +25,65 @@ body{font-family:apple-system,sans-serif;background:var(--light)}
 .hidden{display:none}
 .badge{display:inline-block;padding:3px 8px;border-radius:99px;font-size:10px;font-weight:800;margin-left:6px}
 .ok{background:#DCFCE7;color:#166534}.bad{background:#FEE2E2;color:#991B1B}.warn{background:#FEF3C7;color:#92400E}
-.review{position:relative;padding:10px 30px 10px 10px;border:1px solid #E2E8F0;border-radius:10px;margin-bottom:8px;background:#fff}
-.delRev{position:absolute;right:6px;top:6px;width:22px;height:22px;border-radius:50%;border:0;background:#FEE2E2;color:#991B1B;font-weight:800;cursor:pointer}
 </style>
 </head>
 <body>
-<div class="top"><img src="https://files.catbox.moe/bsim07.jpeg"><h1>SafeStore V2.1</h1><p>Ahora con X para borrar</p></div>
+<div class="top"><img src="https://files.catbox.moe/bsim07.jpeg"><h1>SafeStore V2</h1><p>Análisis automático + validación CUIT</p></div>
 <div class="wrap"><div class="card">
 <div class="tab"><button id="bW" class="active">🌐 Verificar V2</button><button id="bE">📸 Experiencias</button></div>
 <div id="sW">
-<div class="inpWrap"><input id="url" class="input" placeholder="Pega link, dominio o @usuario"><button class="clearBtn" id="clrUrl">×</button></div>
-<div class="inpWrap"><input id="cuit" class="input" placeholder="CUIT (opcional) 30-..."><button class="clearBtn" id="clrCuit">×</button></div>
+<input id="url" class="input" placeholder="Pega link, dominio o @usuario (ej: tienda.com o alias.mp)">
+<input id="cuit" class="input" placeholder="CUIT de la tienda (opcional) Ej: 30-71234567-9">
 <button class="btn" id="btnAuto" style="background:#EFF6FF;color:var(--blue);border:1.5px solid var(--blue)">🔍 Analizar automáticamente</button>
 <div id="autoBox" class="autoBox"></div>
 <p style="margin-top:12px;font-weight:800;font-size:12px">Confirmá señales manuales:</p>
 <div class="checks">
-<label><input type="checkbox" id="c1"> Solo transferencia / alias / cripto <span class="badge bad">CRÍTICO</span></label>
-<label><input type="checkbox" id="c2"> No muestra CUIT ni domicilio</label>
-<label><input type="checkbox" id="c3"> Precios 60% OFF y apura</label>
-<label><input type="checkbox" id="c4"> Sin política de cambios</label>
-<label><input type="checkbox" id="c5"> Solo WhatsApp / fotos robadas</label>
+<label><input type="checkbox" id="c1"> Solo acepta transferencia / alias / cripto <span class="badge bad">CRÍTICO</span></label>
+<label><input type="checkbox" id="c2"> No muestra CUIT ni domicilio real</label>
+<label><input type="checkbox" id="c3"> Precios 60% más baratos y apura "últimas unidades"</label>
+<label><input type="checkbox" id="c4"> Sin política de cambios clara</label>
+<label><input type="checkbox" id="c5"> Solo atiende por WhatsApp / fotos robadas</label>
 </div>
 <button class="btn" id="btnEv">Evaluar nivel de riesgo final</button>
-<div id="res" class="res"><h2 id="tit"></h2><p id="score" style="font-size:12px;color:#475569;margin-top:4px"></p><p id="desc" style="margin-top:8px;font-size:13px"></p></div>
+<div id="res" class="res"><h2 id="tit"></h2><p id="score" style="font-size:12px;color:#475569;margin-top:4px"></p><p id="desc" style="margin-top:8px;font-size:13px"></p><div id="ev" style="margin-top:8px;background:#F8FAFC;padding:8px;border-radius:8px;font-size:11px"></div></div>
 </div>
-<div id="sE" class="hidden"><h3>Comunidad</h3><input id="eN" class="text" placeholder="Tu nombre"><input id="eT" class="text" placeholder="Tienda"><textarea id="eX" class="text" rows="3" placeholder="Qué pasó?"></textarea><input type="file" id="eF" accept="image/*" style="margin-top:8px"><button class="btn" id="btnPub" style="background:#fff;color:var(--blue);border:1.5px solid var(--blue)">Publicar</button><div id="lista" style="margin-top:14px">Cargando...</div></div>
+<div id="sE" class="hidden"><h3>Comunidad</h3><input id="eN" class="text" placeholder="Tu nombre"><input id="eT" class="text" placeholder="Tienda"><textarea id="eX" class="text" rows="3" placeholder="Qué pasó?"></textarea><input type="file" id="eF" accept="image/*"><button class="btn" id="btnPub" style="background:#fff;color:var(--blue);border:1.5px solid var(--blue)">Publicar</button><div id="lista" style="margin-top:14px">Cargando...</div></div>
 </div></div>
 <script>
-const bW=document.getElementById('bW'),bE=document.getElementById('bE'),sW=document.getElementById('sW'),sE=document.getElementById('sE');
 bW.onclick=()=>{bW.className='active';bE.className='';sW.className='';sE.className='hidden'};
 bE.onclick=()=>{bE.className='active';bW.className='';sE.className='';sW.className='hidden'};
-const urlI=document.getElementById('url'),cuitI=document.getElementById('cuit'),clrUrl=document.getElementById('clrUrl'),clrCuit=document.getElementById('clrCuit'),autoBox=document.getElementById('autoBox');
-function tog(inp,btn){btn.style.display=inp.value?'flex':'none'}
-urlI.addEventListener('input',()=>tog(urlI,clrUrl));cuitI.addEventListener('input',()=>tog(cuitI,clrCuit));
-clrUrl.onclick=()=>{urlI.value='';tog(urlI,clrUrl);autoBox.style.display='none'};
-clrCuit.onclick=()=>{cuitI.value='';tog(cuitI,clrCuit)};
 function validaCUIT(c){c=c.replace(/[^0-9]/g,'');if(c.length!=11)return false;let s=0,m=[5,4,3,2,7,6,5,4,3,2];for(let i=0;i<10;i++)s+=parseInt(c[i])*m[i];let r=11-s%11;if(r==11)r=0;if(r==10)r=9;return r==parseInt(c[10])}
-function getDomain(u){try{if(!u.includes('://'))u='https://'+u;return new URL(u).hostname.replace('www.','')}catch{return u.replace('@','').split('/')[0]}}
-document.getElementById('btnAuto').onclick=async()=>{
-let u=urlI.value.trim();if(!u){alert('Pega un link');return}autoBox.style.display='block';autoBox.innerHTML='Analizando...';
-let d=getDomain(u);let f=[];if(u.includes('http://'))f.push('❌ Sin HTTPS <span class=badge bad>ALTO</span>');else f.push('✅ Tiene HTTPS <span class=badge ok>OK</span>');
-if(u.match(/\.mp$|\.uala$|mercadopago|alias/i))f.push('❌ Solo alias personal <span class=badge bad>ALTO</span>');
-if(u.startsWith('@')||u.includes('instagram'))f.push('⚠️ Perfil social: pedí CUIT <span class=badge warn>MEDIO</span>');
-let age='No pude verificar edad';if(d.includes('.')){try{let r=await fetch('https://rdap.org/domain/'+d);if(r.ok){let j=await r.json();let ev=j.events?.find(e=>e.eventAction==='registration');if(ev){let date=new Date(ev.eventDate);let diff=(Date.now()-
+function getDomain(u){try{if(!u.includes('://'))u='https://'+u;let d=new URL(u).hostname.replace('www.','');return d}catch{return u.replace('@','').split('/')[0]}}
+btnAuto.onclick=async ()=>{
+let u=url.value.trim();let box=autoBox;if(!u){alert('Pega un link');return}
+box.style.display='block';box.innerHTML='Analizando...';
+let d=getDomain(u);let findings=[];
+if(u.includes('http://'))findings.push('❌ Sin HTTPS (no tiene candado) <span class=badge bad>ALTO</span>');
+else findings.push('✅ Tiene HTTPS <span class=badge ok>OK</span>');
+if(u.match(/\.mp$|\.uala$|mercadopago|alias/))findings.push('❌ Solo alias personal MP/Ualá, no empresa <span class=badge bad>ALTO</span>');
+if(u.startsWith('@')||u.includes('instagram')||u.includes('tiktok'))findings.push('⚠️ Perfil social: pedí CUIT y referencias externas <span class=badge warn>MEDIO</span>');
+let ageText='No pude verificar edad (dominio social o alias)';
+if(d.includes('.')){try{let r=await fetch('https://rdap.org/domain/'+d);if(r.ok){let j=await r.json();let ev=j.events?.find(e=>e.eventAction==='registration');if(ev){let date=new Date(ev.eventDate);let diff=(Date.now()-date)/1000/60/60/24;ageText='Dominio creado: '+date.toLocaleDateString()+' ('+Math.floor(diff)+' días)';if(diff<90)findings.push('❌ Dominio muy nuevo: '+Math.floor(diff)+' días <span class=badge bad>ALTO</span>');else if(diff<365)findings.push('⚠️ Dominio joven: '+Math.floor(diff)+' días <span class=badge warn>MEDIO</span>');else findings.push('✅ Dominio antiguo: '+Math.floor(diff)+' días <span class=badge ok>OK</span>');}}}catch{}}
+let cu=cuit.value.trim();let cuitMsg='';
+if(cu){if(validaCUIT(cu))cuitMsg='✅ CUIT válido por dígito verificador <span class=badge ok>OK</span>';else{cuitMsg='❌ CUIT inválido / inventado <span class=badge bad>ALTO</span>';findings.push(cuitMsg)}}
+box.innerHTML='<b>'+d+'</b><br>'+ageText+'<br><br>'+findings.join('<br>')+(cuitMsg?'<br>'+cuitMsg:'');
+box.dataset.risk=findings.filter(f=>f.includes('ALTO')).length;
+};
+btnEv.onclick=()=>{
+let autoRisk=parseInt(autoBox.dataset.risk||0);
+let manual=0;['c1','c2','c3','c4','c5'].forEach(id=>{if(document.getElementById(id).checked)manual++});
+let total=autoRisk*2+manual;
+if(document.getElementById('c1').checked)total+=2;
+res.style.display='block';
+if(total>=5){res.style.background='#FEF2F2';res.style.border='2px solid #FECACA';tit.innerHTML='🔴 Riesgo Alto V2';desc.innerHTML='Coinciden varias señales automáticas + manuales. No pagues por transferencia. Pedí factura y CUIT verificable.'}
+else if(total>=2){res.style.background='#FFFBEB';res.style.border='2px solid #FDE68A';tit.innerHTML='🟡 Riesgo Medio';desc.innerHTML='Hay señales para revisar. Pedí más datos y pagá con protección.'}
+else{res.style.background='#F0FDF4';res.style.border='2px solid #BBF7D0';tit.innerHTML='🟢 Riesgo Bajo';desc.innerHTML='No se detectaron señales automáticas graves. Igual verificá reseñas.'}
+score.innerHTML='Score automático: '+autoRisk+' crítico(s) | Manuales: '+manual+'/5 | Total ponderado: '+total;
+};
+var supabaseClient=null,mis=JSON.parse(localStorage.getItem('misReportes')||'[]');
+(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=function(){supabaseClient=supabase.createClient('https://ltaghuumilyjdzpmatqj.supabase.co','sb_publishable_KXmx7LEqpZ3g5u-iRMeyDA__bWJBbqH');cargar()};document.head.appendChild(s)})();
+async function cargar(){if(!supabaseClient)return;let r=await supabaseClient.from('experiencias').select('*').order('id',{ascending:false}).limit(40);if(!r.data)return;lista.innerHTML=r.data.map(x=>'<div style="padding:10px;border:1px solid #E2E8F0;border-radius:10px;margin-bottom:8px"><b>'+x.tienda+'</b> - '+(x.nombre||'Anónimo')+'<br><span style="font-size:12px">'+x.texto+'</span>'+(x.foto?'<br><img src="'+x.foto+'" style="width:100%;max-height:200px;border-radius:8px;margin-top:6px">':'')+'</div>').join('')}
+btnPub.onclick=async function(){let t=eT.value.trim(),x=eX.value.trim(),n=eN.value.trim()||'Anónimo';if(!t||!x){alert('Falta tienda o texto');return}let f=eF.files[0],foto=null;if(f)foto=await new Promise(r=>{let fr=new FileReader();fr.onload=e=>r(e.target.result);fr.readAsDataURL(f)});await supabaseClient.from('experiencias').insert([{nombre:n,tienda:t,texto:x,foto:foto}]);eT.value='';eX.value='';cargar()}
+</script>
+</body>
+</html>
