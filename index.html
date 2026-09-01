@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SafeStore - Verificá antes de pagar</title>
+<link rel="icon" href="https://files.catbox.moe/bsim07.jpeg">
+<meta property="og:image" content="https://files.catbox.moe/bsim07.jpeg">
+<style>
+:root{--blue:#0F2C61;--blue2:#1E4BD8;--light:#F1F5F9}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:apple-system,sans-serif;background:var(--light)}
+.top{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;padding:28px 20px 40px;text-align:center}
+.top img{width:90px;height:90px;background:#fff;border-radius:22px;padding:10px;margin-bottom:10px}
+.top h1{font-size:30px;font-weight:900}
+.wrap{max-width:740px;margin:-20px auto 0;padding:0 12px 40px}
+.card{background:#fff;border-radius:18px;padding:18px;border:1px solid #DBEAFE;box-shadow:0 6px 20px rgba(15,44,97,.08)}
+.tab{display:flex;gap:8px;margin-bottom:14px}
+.tab button{flex:1;padding:12px;border-radius:10px;border:1.5px solid #BFDBFE;background:#EFF6FF;font-weight:800;cursor:pointer}
+.tab button.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.input{width:100%;padding:14px;border-radius:12px;border:2px solid #BFDBFE;font-size:15px}
+.checks{display:grid;gap:8px;margin-top:14px}
+.checks label{display:flex;gap:10px;padding:11px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;font-size:13px}
+.btn{width:100%;margin-top:14px;padding:14px;border-radius:12px;background:var(--blue);color:#fff;font-weight:800;border:0;cursor:pointer}
+.btn2{background:#fff;color:var(--blue);border:1.5px solid var(--blue)}
+.res{margin-top:16px;border-radius:16px;padding:14px;display:none}
+.hidden{display:none}
+.text{width:100%;padding:10px;border:1px solid #CBD5E1;border-radius:8px;margin-top:8px;font-size:13px}
+.exp-card{padding:12px;border:1px solid #E2E8F0;border-radius:12px;background:#fff;margin-bottom:10px}
+.small{font-size:11px;color:#64748B}
+.del{margin-top:8px;padding:6px 10px;border-radius:8px;border:1px solid #FECACA;background:#FEF2F2;color:#B91C1C;font-size:11px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="top">
+<img src="https://files.catbox.moe/bsim07.jpeg">
+<h1>SafeStore</h1><p>Verificá señales de riesgo antes de pagar</p>
+</div>
+<div class="wrap"><div class="card">
+<div class="tab"><button id="bW" class="active">🌐 Verificar</button><button id="bE">📸 Experiencias</button></div>
+<div id="sW">
+<input id="url" class="input" placeholder="Pega link o @usuario">
+<div class="checks">
+<label><input type="checkbox" id="c1"> Solo acepta transferencia / alias / cripto</label>
+<label><input type="checkbox" id="c2"> No muestra CUIT, razón social ni domicilio</label>
+<label><input type="checkbox" id="c3"> Precios 60% más baratos y apura "últimas unidades"</label>
+<label><input type="checkbox" id="c4"> Sin política de cambios/devoluciones clara</label>
+<label><input type="checkbox" id="c5"> Fotos robadas / solo atiende por WhatsApp</label>
+</div>
+<button class="btn" id="btnEv">Evaluar nivel de riesgo</button>
+<button class="btn btn2" id="btnBor" style="display:none">🗑️ Borrar todo</button>
+<div id="res" class="res"><h2 id="tit"></h2><p id="score" class="small"></p><p id="desc" style="margin-top:8px"></p><div id="ev" style="margin-top:8px;background:#F8FAFC;padding:8px;border-radius:8px;font-size:12px"></div></div>
+</div>
+<div id="sE" class="hidden">
+<h3>Experiencias de la comunidad</h3><p class="small" style="margin:6px 0">Se guardan para todos. Podés borrar solo tu reporte.</p>
+<input id="eN" class="text" placeholder="Tu nombre (opcional)">
+<input id="eT" class="text" placeholder="Tienda o @usuario">
+<textarea id="eX" class="text" rows="3" placeholder="Qué pasó?"></textarea>
+<input type="file" id="eF" accept="image/*" style="margin-top:8px">
+<button class="btn btn2" id="btnPub">Publicar experiencia</button>
+<div id="lista" style="margin-top:14px">Cargando...</div>
+</div>
+</div></div>
+<script>
+bW.onclick=function(){bW.className='active';bE.className='';sW.className='';sE.className='hidden'};bE.onclick=function(){bE.className='active';bW.className='';sE.className='';sW.className='hidden'};
+url.oninput=function(){btnBor.style.display=this.value?'block':'none'};
+btnBor.onclick=function(){url.value='';res.style.display='none';this.style.display='none';document.querySelectorAll('#sW input[type=checkbox]').forEach(function(c){c.checked=false})};
+btnEv.onclick=function(){if(!url.value.trim()){alert('Pega un link');return}var ids=['c1','c2','c3','c4','c5'];var c=0;ids.forEach(function(id){if(document.getElementById(id).checked)c++});res.style.display='block';if(c>=3){res.style.background='#FEF2F2';res.style.border='2px solid #FECACA';tit.innerHTML='🔴 Riesgo Alto';desc.innerHTML='Tiene '+c+' señales. No transfieras. Pedí CUIT, buscá reseñas y pagá con protección.'}else if(c>=1){res.style.background='#FFFBEB';res.style.border='2px solid #FDE68A';tit.innerHTML='🟡 Riesgo Medio';desc.innerHTML='Tiene '+c+' señal. Verificá más antes de pagar.'}else{res.style.background='#F0FDF4';res.style.border='2px solid #BBF7D0';tit.innerHTML='🟢 Sin señales graves';desc.innerHTML='No marcaste señales, igual verificá CUIT y reputación.'}score.innerHTML='Señales: '+c+'/5';var d=[];ids.forEach(function(id){var el=document.getElementById(id);if(el.checked)d.push(el.parentElement.textContent.trim())});ev.innerHTML='<b>Marcaste:</b><br>- '+(d.length?d.join('<br>- '):'Nada')};
+var supabaseClient=null;var mis=JSON.parse(localStorage.getItem('misReportes')||'[]');
+(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=function(){supabaseClient=supabase.createClient('https://ltaghuumilyjdzpmatqj.supabase.co','sb_publishable_KXmx7LEqpZ3g5u-iRMeyDA__bWJBbqH');cargar()};document.head.appendChild(s)})();
+async function cargar(){var cont=lista;if(!supabaseClient)return;var r=await supabaseClient.from('experiencias').select('*').order('id',{ascending:false}).limit(50);if(r.error){cont.innerHTML=r.error.message;return}if(!r.data.length){cont.innerHTML='<p class=small>Sin experiencias</p>';return}var h='';r.data.forEach(function(x){var img=x.foto?'<img src="'+x.foto+'" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-top:6px">':'';var del=mis.indexOf(x.id)!==-1?'<button class=del onclick="borrar('+x.id+')">🗑️ Borrar mi reporte</button>':'';h+='<div class=exp-card><b>'+x.tienda+'</b> <span class=small>• '+(x.nombre||'Anónimo')+'</span><div style="margin-top:6px">'+x.texto+'</div>'+img+'<br>'+del+'</div>'});cont.innerHTML=h}
+async function borrar(id){if(!confirm('¿Borrar tu reporte?'))return;var r=await supabaseClient.from('experiencias').delete().eq('id',id);if(r.error){alert(r.error.message);return}mis=mis.filter(function(v){return v!==id});localStorage.setItem('misReportes',JSON.stringify(mis));cargar()}window.borrar=borrar;
+btnPub.onclick=async function(){if(!supabaseClient){alert('Esperá 2 seg');return}var t=eT.value.trim();var x=eX.value.trim();var n=eN.value.trim()||'Anónimo';if(!t||!x){alert('Completa tienda y experiencia');return}var b=this;b.innerHTML='Publicando...';b.disabled=true;var f=eF.files[0];var foto=null;if(f){foto=await new Promise(function(r){var fr=new FileReader();fr.onload=function(e){r(e.target.result)};fr.readAsDataURL(f)})}var ins=await supabaseClient.from('experiencias').insert([{nombre:n,tienda:t,texto:x,foto:foto}]).select();if(ins.error){ins=await supabaseClient.from('experiencias').insert([{nombre:n,tienda:t,texto:x}]).select()}if(ins.error)alert(ins.error.message);else{var nid=ins.data&&ins.data[0]&&ins.data[0].id;if(nid){mis.push(nid);localStorage.setItem('misReportes',JSON.stringify(mis))}eT.value='';eX.value='';eF.value='';cargar()}b.innerHTML='Publicar experiencia';b.disabled=false}
+</script>
+</body>
+</html>
