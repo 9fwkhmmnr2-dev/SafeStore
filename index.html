@@ -1,89 +1,446 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SafeStore V2 - Análisis Automático</title>
-<link rel="icon" href="https://files.catbox.moe/bsim07.jpeg">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SafeStore - Verificá antes de pagar</title>
 <style>
-:root{--blue:#0F2C61;--blue2:#1E4BD8;--light:#F1F5F9}
+:root{--blue:#0F2C61;--blue2:#1E4BD8;--light:#F1F5F9;--ok:#16a34a;--mid:#d97706;--bad:#dc2626}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:apple-system,sans-serif;background:var(--light)}
-.top{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;padding:28px 20px 40px;text-align:center}
-.top img{width:90px;height:90px;background:#fff;border-radius:22px;padding:10px;margin-bottom:10px}
-.wrap{max-width:760px;margin:-20px auto 0;padding:0 12px 40px}
-.card{background:#fff;border-radius:18px;padding:18px;border:1px solid #DBEAFE;box-shadow:0 6px 20px rgba(15,44,97,.08)}
-.tab{display:flex;gap:8px;margin-bottom:14px}
-.tab button{flex:1;padding:12px;border-radius:10px;border:1.5px solid #BFDBFE;background:#EFF6FF;font-weight:800;cursor:pointer}
-.tab button.active{background:var(--blue);color:#fff;border-color:var(--blue)}
-.input{width:100%;padding:14px;border-radius:12px;border:2px solid #BFDBFE;font-size:15px;margin-bottom:8px}
-.autoBox{background:#F8FAFC;border:1px dashed #93C5FD;border-radius:12px;padding:12px;margin:10px 0;font-size:12px;display:none}
-.checks{display:grid;gap:8px;margin-top:10px}
-.checks label{display:flex;gap:10px;padding:11px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;font-size:13px}
-.btn{width:100%;margin-top:14px;padding:14px;border-radius:12px;background:var(--blue);color:#fff;font-weight:800;border:0;cursor:pointer}
-.res{margin-top:16px;border-radius:16px;padding:14px;display:none}
-.text{width:100%;padding:10px;border:1px solid #CBD5E1;border-radius:8px;margin-top:8px;font-size:13px}
+body{font-family:apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;background:var(--light);color:#1E293B;line-height:1.4}
+.top{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;padding:30px 20px 48px;text-align:center}
+.top h1{font-size:30px;font-weight:900;letter-spacing:-.5px}
+.top p.sub{margin-top:6px;font-size:15px;opacity:.9}
+.top p.claim{margin-top:14px;display:inline-block;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600}
+.wrap{max-width:760px;margin:-24px auto 0;padding:0 12px 50px}
+.card{background:#fff;border-radius:20px;padding:18px;border:1px solid #DBEAFE;margin-bottom:16px;box-shadow:0 8px 24px rgba(15,44,97,.06)}
+.hero-title{font-size:18px;font-weight:800}
+.hero-desc{font-size:13px;color:#64748B;margin-top:4px}
+.tab{display:flex;gap:8px;margin:16px 0}
+.tab button{flex:1;padding:12px;border-radius:12px;border:1.5px solid #BFDBFE;background:#EFF6FF;font-weight:700;cursor:pointer;transition:.2s}
+.tab button.active{background:var(--blue);color:#fff;border-color:var(--blue);transform:translateY(-1px)}
+.input{width:100%;padding:15px 14px;border-radius:14px;border:2px solid #BFDBFE;font-size:15px;outline:none;transition:.2s}
+.input:focus{border-color:var(--blue2);box-shadow:0 0 0 3px #DBEAFE}
+.section-label{font-size:12px;font-weight:800;color:#334155;letter-spacing:.5px;text-transform:uppercase;margin:18px 0 8px;display:flex;justify-content:space-between}
+.grid{display:grid;gap:8px}
+.check{position:relative;display:flex;gap:10px;padding:11px 12px;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:12px;font-size:13px;cursor:pointer;transition:.15s}
+.check:has(input:checked){border-color:#93C5FD;background:#EFF6FF}
+.check.risk:has(input:checked){border-color:#FCA5A5;background:#FEF2F2}
+.check.pos:has(input:checked){border-color:#86EFAC;background:#F0FDF4}
+.check input{margin-top:2px}
+.why-btn{margin-left:auto;background:#fff;border:1px solid #E2E8F0;border-radius:999px;padding:2px 8px;font-size:11px;cursor:pointer;color:#475569}
+.why-box{display:none;margin-top:8px;padding:8px 10px;background:#fff;border:1px dashed #CBD5E1;border-radius:8px;font-size:12px;color:#475569}
+.why-box.open{display:block}
+.btn{width:100%;margin-top:14px;padding:15px;border-radius:14px;background:var(--blue);color:#fff;font-weight:800;border:0;cursor:pointer;font-size:15px;transition:.2s}
+.btn:active{transform:scale(.98)}
+.btn2{background:#fff;color:var(--blue);border:2px solid var(--blue)}
+.res{margin-top:16px;border-radius:18px;padding:0;overflow:hidden;display:none;border:2px solid #E2E8F0}
+.res-head{padding:16px}
+.res-body{padding:14px;background:#fff}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.kpi{padding:10px;border-radius:12px;border:1px solid #E2E8F0;background:#F8FAFC}
+.kpi b{font-size:18px;display:block}
+.state-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.state{font-size:11px;padding:5px 8px;border-radius:999px;border:1px solid #E2E8F0;background:#fff;display:inline-flex;align-items:center;gap:4px}
+.domain-card{margin-top:10px;display:grid;gap:6px}
+.domain-item{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid #E2E8F0;border-radius:10px;font-size:12px;background:#F8FAFC}
+.action-list{margin-top:8px;display:grid;gap:6px}
+.action-list li{list-style:none;padding:8px 10px;background:#F1F5F9;border-radius:10px;font-size:12px;border:1px solid #E2E8F0}
+.small{font-size:11px;color:#64748B}
+.exp-card{padding:12px;border:1px solid #E2E8F0;border-radius:14px;background:#fff;margin-bottom:10px;position:relative}
+.del{margin-top:8px;padding:6px 10px;border-radius:8px;border:1px solid #FECACA;background:#FEF2F2;color:#B91C1C;font-size:11px;cursor:pointer}
+.text{width:100%;padding:11px;border:1px solid #CBD5E1;border-radius:10px;margin-top:8px;font-size:13px}
+select.text{padding:11px}
+.hist-item{display:flex;justify-content:space-between;gap:8px;padding:10px;border:1px solid #E2E8F0;border-radius:10px;margin-bottom:6px;background:#fff;font-size:12px}
+.disclaimer{margin-top:12px;padding:10px 12px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;font-size:11px;color:#64748B}
 .hidden{display:none}
-.badge{display:inline-block;padding:3px 8px;border-radius:99px;font-size:10px;font-weight:800;margin-left:6px}
-.ok{background:#DCFCE7;color:#166534}.bad{background:#FEE2E2;color:#991B1B}.warn{background:#FEF3C7;color:#92400E}
+.anim{animation:pop.25s ease}
+@keyframes pop{from{transform:translateY(4px);opacity:0}to{transform:translateY(0);opacity:1}}
 </style>
 </head>
 <body>
-<div class="top"><img src="https://files.catbox.moe/bsim07.jpeg"><h1>SafeStore V2</h1><p>Análisis automático + validación CUIT</p></div>
-<div class="wrap"><div class="card">
-<div class="tab"><button id="bW" class="active">🌐 Verificar V2</button><button id="bE">📸 Experiencias</button></div>
-<div id="sW">
-<input id="url" class="input" placeholder="Pega link, dominio o @usuario (ej: tienda.com o alias.mp)">
-<input id="cuit" class="input" placeholder="CUIT de la tienda (opcional) Ej: 30-71234567-9">
-<button class="btn" id="btnAuto" style="background:#EFF6FF;color:var(--blue);border:1.5px solid var(--blue)">🔍 Analizar automáticamente</button>
-<div id="autoBox" class="autoBox"></div>
-<p style="margin-top:12px;font-weight:800;font-size:12px">Confirmá señales manuales:</p>
-<div class="checks">
-<label><input type="checkbox" id="c1"> Solo acepta transferencia / alias / cripto <span class="badge bad">CRÍTICO</span></label>
-<label><input type="checkbox" id="c2"> No muestra CUIT ni domicilio real</label>
-<label><input type="checkbox" id="c3"> Precios 60% más baratos y apura "últimas unidades"</label>
-<label><input type="checkbox" id="c4"> Sin política de cambios clara</label>
-<label><input type="checkbox" id="c5"> Solo atiende por WhatsApp / fotos robadas</label>
+<div class="top">
+<h1>🛡️ SafeStore</h1>
+<p class="sub">Antes de comprar, verificá.</p>
+<p class="sub" style="font-size:13px;margin-top:2px">Pegá un enlace y revisá las señales de riesgo de una tienda.</p>
+<p class="claim">No afirmamos estafas sin evidencia. Mostramos señales comprobables.</p>
 </div>
-<button class="btn" id="btnEv">Evaluar nivel de riesgo final</button>
-<div id="res" class="res"><h2 id="tit"></h2><p id="score" style="font-size:12px;color:#475569;margin-top:4px"></p><p id="desc" style="margin-top:8px;font-size:13px"></p><div id="ev" style="margin-top:8px;background:#F8FAFC;padding:8px;border-radius:8px;font-size:11px"></div></div>
+
+<div class="wrap">
+
+<div class="card">
+<div class="tab"><button id="btnTabWeb" class="active">🌐 Analizar enlace</button><button id="btnTabExp">📸 Comunidad</button></div>
+
+<div id="seccionWeb">
+<div class="hero-title">Verificá antes de pagar</div>
+<div class="hero-desc">SafeStore analiza señales de riesgo visibles y lo que nos contás vos. No inventamos datos de CUIT, dominio o antigüedad.</div>
+
+<input id="url" class="input" placeholder="Pega link / usuario (IG o TikTok) ej: tienda.com o @tienda" style="margin-top:14px">
+
+<div class="section-label"><span>⚠️ Señales de riesgo - ℹ️ Info que aportás vos</span><span class="small">Tildá lo que veas</span></div>
+<div class="grid" id="riskChecks">
+<label class="check risk"><input type="checkbox" id="c1"><span><b>Solo acepta transferencia / cripto</b></span><button class="why-btn" data-w="w1">ⓘ ¿Por qué?</button><div class="why-box" id="w1">Las tiendas que evitan métodos con protección al comprador dejan menos rastro y menos posibilidad de reclamo. No es prueba de estafa por sí solo, pero es señal de riesgo alta.</div></label>
+<label class="check risk"><input type="checkbox" id="c2"><span><b>No muestra CUIT ni domicilio</b></span><button class="why-btn" data-w="w2">ⓘ ¿Por qué?</button><div class="why-box" id="w2">En Argentina un comercio real suele mostrar razón social, CUIT y domicilio. Si no hay nada, no podés verificar quién te vende.</div></label>
+<label class="check risk"><input type="checkbox" id="c3"><span><b>Precios 60% más baratos y apura a pagar</b></span><button class="why-btn" data-w="w3">ⓘ ¿Por qué?</button><div class="why-box" id="w3">Descuentos irreales + urgencia ("solo hoy") es una técnica común para que no verifiques. Compará con canales oficiales.</div></label>
+<label class="check risk"><input type="checkbox" id="c4"><span><b>Sin política de cambios / devoluciones</b></span><button class="why-btn" data-w="w4">ⓘ ¿Por qué?</button><div class="why-box" id="w4">La falta de políticas claras deja al comprador sin protección si el producto no llega o llega fallado.</div></label>
+<label class="check risk"><input type="checkbox" id="c5"><span><b>Fotos robadas, reseñas sin foto o solo WhatsApp</b></span><button class="why-btn" data-w="w5">ⓘ ¿Por qué?</button><div class="why-box" id="w5">Tiendas nuevas que usan fotos de otras marcas y solo atienden por WhatsApp privado suelen evitar dejar registro público.</div></label>
 </div>
-<div id="sE" class="hidden"><h3>Comunidad</h3><input id="eN" class="text" placeholder="Tu nombre"><input id="eT" class="text" placeholder="Tienda"><textarea id="eX" class="text" rows="3" placeholder="Qué pasó?"></textarea><input type="file" id="eF" accept="image/*"><button class="btn" id="btnPub" style="background:#fff;color:var(--blue);border:1.5px solid var(--blue)">Publicar</button><div id="lista" style="margin-top:14px">Cargando...</div></div>
-</div></div>
+
+<div class="section-label"><span>✅ Señales positivas - ℹ️ Info que aportás vos</span></div>
+<div class="grid">
+<label class="check pos"><input type="checkbox" id="c6"><span><b>Muestra CUIT y podés verificarlo en AFIP</b></span><button class="why-btn" data-w="w6">ⓘ ¿Por qué?</button><div class="why-box" id="w6">Si muestra CUIT, podés buscarlo en constancia de AFIP. Es una buena señal, pero SafeStore no verifica CUIT automáticamente todavía.</div></label>
+<label class="check pos"><input type="checkbox" id="c7"><span><b>Tiene políticas claras y medios de pago con protección</b></span><button class="why-btn" data-w="w7">ⓘ ¿Por qué?</button><div class="why-box" id="w7">MercadoPago, tarjeta, etc. dan más trazabilidad que solo transferencia.</div></label>
+<label class="check pos"><input type="checkbox" id="c8"><span><b>Redes activas, reseñas reales y antigüedad visible</b></span><button class="why-btn" data-w="w8">ⓘ ¿Por qué?</button><div class="why-box" id="w8">Presencia sostenida en el tiempo es señal positiva, pero no garantiza seguridad.</div></label>
+</div>
+
+<button class="btn" id="btnEvaluar">🔍 Analizar enlace</button>
+<button class="btn btn2" id="btnBorrar" style="display:none;margin-top:8px">🗑️ Borrar todo</button>
+
+<div id="res" class="res anim">
+<div class="res-head" id="resHead">
+<h2 id="tit" style="font-size:18px"></h2>
+<p id="score" class="small" style="margin-top:4px"></p>
+<div class="state-row" id="stateRow"></div>
+</div>
+<div class="res-body">
+<div class="kpis">
+<div class="kpi"><span class="small">Señales de riesgo</span><b id="kpiRisk">0</b><span class="small">ℹ️ Aportadas por vos</span></div>
+<div class="kpi"><span class="small">Señales positivas</span><b id="kpiPos">0</b><span class="small">ℹ️ Aportadas por vos</span></div>
+</div>
+
+<div style="margin-top:14px">
+<b style="font-size:13px">🔎 Análisis del dominio</b>
+<div class="domain-card" id="domainCard"></div>
+</div>
+
+<div style="margin-top:14px">
+<b style="font-size:13px">📋 Qué comprobamos y qué no</b>
+<div id="ev" style="margin-top:8px;display:grid;gap:6px"></div>
+</div>
+
+<div style="margin-top:14px">
+<b style="font-size:13px">👥 Experiencias de la comunidad para este dominio</b>
+<div id="resExpSum" style="margin-top:6px" class="small">Analizando...</div>
+</div>
+
+<div style="margin-top:14px">
+<b style="font-size:13px">👉 Qué hacer ahora</b>
+<ul id="todoList" class="action-list"></ul>
+</div>
+
+<div class="disclaimer">
+<b>Transparencia:</b> SafeStore analiza señales de riesgo y no puede garantizar que una tienda sea segura o una estafa. Los resultados deben utilizarse como orientación.
+<span id="disclaimerExtra"></span>
+</div>
+</div>
+</div>
+
+<div id="historialBox" style="margin-top:18px">
+<div class="section-label"><span>🕓 Historial local en este dispositivo</span><button class="why-btn" id="btnClearHist">Borrar historial</button></div>
+<div id="histList" class="small">Sin análisis previos</div>
+</div>
+</div>
+
+<div id="seccionExp" class="hidden">
+<h3 style="font-size:16px">📸 Experiencias de compradores</h3>
+<p class="small" style="margin-top:4px">Contá tu experiencia real. No inventamos testimonios. Solo el autor puede borrar su reporte desde este dispositivo.</p>
+
+<select id="expTipo" class="text">
+<option value="ok">🟢 Compré y salió bien</option>
+<option value="dudosa">🟡 Tuve una experiencia dudosa</option>
+<option value="mala">🔴 Tuve problemas</option>
+</select>
+<input id="expNombre" class="text" placeholder="Tu nombre (opcional)">
+<input id="expTienda" class="text" placeholder="Tienda o @usuario - ej: tienda.com">
+<textarea id="expTexto" class="text" rows="3" placeholder="Qué pasó? Cuándo compraste? Te llegó?"></textarea>
+<input type="file" id="expFoto" accept="image/*" style="margin-top:8px;font-size:12px">
+<p class="small">Podés subir foto del comprobante / captura (opcional). La imagen se guarda como base64.</p>
+<button class="btn btn2" id="btnPub">Publicar experiencia</button>
+
+<div id="resumenExp" class="card" style="margin-top:14px;padding:12px;background:#F8FAFC"></div>
+<div id="listaExp" style="margin-top:14px">Cargando...</div>
+</div>
+
+</div>
+</div>
+
 <script>
-bW.onclick=()=>{bW.className='active';bE.className='';sW.className='';sE.className='hidden'};
-bE.onclick=()=>{bE.className='active';bW.className='';sE.className='';sW.className='hidden'};
-function validaCUIT(c){c=c.replace(/[^0-9]/g,'');if(c.length!=11)return false;let s=0,m=[5,4,3,2,7,6,5,4,3,2];for(let i=0;i<10;i++)s+=parseInt(c[i])*m[i];let r=11-s%11;if(r==11)r=0;if(r==10)r=9;return r==parseInt(c[10])}
-function getDomain(u){try{if(!u.includes('://'))u='https://'+u;let d=new URL(u).hostname.replace('www.','');return d}catch{return u.replace('@','').split('/')[0]}}
-btnAuto.onclick=async ()=>{
-let u=url.value.trim();let box=autoBox;if(!u){alert('Pega un link');return}
-box.style.display='block';box.innerHTML='Analizando...';
-let d=getDomain(u);let findings=[];
-if(u.includes('http://'))findings.push('❌ Sin HTTPS (no tiene candado) <span class=badge bad>ALTO</span>');
-else findings.push('✅ Tiene HTTPS <span class=badge ok>OK</span>');
-if(u.match(/\.mp$|\.uala$|mercadopago|alias/))findings.push('❌ Solo alias personal MP/Ualá, no empresa <span class=badge bad>ALTO</span>');
-if(u.startsWith('@')||u.includes('instagram')||u.includes('tiktok'))findings.push('⚠️ Perfil social: pedí CUIT y referencias externas <span class=badge warn>MEDIO</span>');
-let ageText='No pude verificar edad (dominio social o alias)';
-if(d.includes('.')){try{let r=await fetch('https://rdap.org/domain/'+d);if(r.ok){let j=await r.json();let ev=j.events?.find(e=>e.eventAction==='registration');if(ev){let date=new Date(ev.eventDate);let diff=(Date.now()-date)/1000/60/60/24;ageText='Dominio creado: '+date.toLocaleDateString()+' ('+Math.floor(diff)+' días)';if(diff<90)findings.push('❌ Dominio muy nuevo: '+Math.floor(diff)+' días <span class=badge bad>ALTO</span>');else if(diff<365)findings.push('⚠️ Dominio joven: '+Math.floor(diff)+' días <span class=badge warn>MEDIO</span>');else findings.push('✅ Dominio antiguo: '+Math.floor(diff)+' días <span class=badge ok>OK</span>');}}}catch{}}
-let cu=cuit.value.trim();let cuitMsg='';
-if(cu){if(validaCUIT(cu))cuitMsg='✅ CUIT válido por dígito verificador <span class=badge ok>OK</span>';else{cuitMsg='❌ CUIT inválido / inventado <span class=badge bad>ALTO</span>';findings.push(cuitMsg)}}
-box.innerHTML='<b>'+d+'</b><br>'+ageText+'<br><br>'+findings.join('<br>')+(cuitMsg?'<br>'+cuitMsg:'');
-box.dataset.risk=findings.filter(f=>f.includes('ALTO')).length;
+// Tabs
+document.getElementById('btnTabWeb').onclick=function(){document.getElementById('btnTabWeb').className='active';document.getElementById('btnTabExp').className='';document.getElementById('seccionWeb').className='';document.getElementById('seccionExp').className='hidden';};
+document.getElementById('btnTabExp').onclick=function(){document.getElementById('btnTabExp').className='active';document.getElementById('btnTabWeb').className='';document.getElementById('seccionExp').className='';document.getElementById('seccionWeb').className='hidden';};
+
+// Why toggles
+document.addEventListener('click',function(e){
+ if(e.target.classList.contains('why-btn') && e.target.dataset.w){
+   var box=document.getElementById(e.target.dataset.w);
+   if(box) box.classList.toggle('open');
+ }
+});
+
+// Input UI
+document.getElementById('url').oninput=function(){document.getElementById('btnBorrar').style.display=this.value.length>0?'block':'none';};
+document.getElementById('btnBorrar').onclick=function(){
+ document.getElementById('url').value='';
+ document.getElementById('res').style.display='none';
+ this.style.display='none';
+ document.querySelectorAll('#seccionWeb input[type=checkbox]').forEach(c=>c.checked=false);
 };
-btnEv.onclick=()=>{
-let autoRisk=parseInt(autoBox.dataset.risk||0);
-let manual=0;['c1','c2','c3','c4','c5'].forEach(id=>{if(document.getElementById(id).checked)manual++});
-let total=autoRisk*2+manual;
-if(document.getElementById('c1').checked)total+=2;
-res.style.display='block';
-if(total>=5){res.style.background='#FEF2F2';res.style.border='2px solid #FECACA';tit.innerHTML='🔴 Riesgo Alto V2';desc.innerHTML='Coinciden varias señales automáticas + manuales. No pagues por transferencia. Pedí factura y CUIT verificable.'}
-else if(total>=2){res.style.background='#FFFBEB';res.style.border='2px solid #FDE68A';tit.innerHTML='🟡 Riesgo Medio';desc.innerHTML='Hay señales para revisar. Pedí más datos y pagá con protección.'}
-else{res.style.background='#F0FDF4';res.style.border='2px solid #BBF7D0';tit.innerHTML='🟢 Riesgo Bajo';desc.innerHTML='No se detectaron señales automáticas graves. Igual verificá reseñas.'}
-score.innerHTML='Score automático: '+autoRisk+' crítico(s) | Manuales: '+manual+'/5 | Total ponderado: '+total;
+
+function parseDomain(raw){
+ if(!raw) return null;
+ let v=raw.trim();
+ if(v.startsWith('@')) return {raw:v,type:'social',domain:v,https:'❓ No aplica',note:'Usuario social, no dominio web'};
+ try{
+   if(!v.match(/^https?:\/\//)) v='https://'+v.replace(/^\/\//,'');
+   const u=new URL(v);
+   const hostname=u.hostname;
+   const isIp=/^\d+\.\d+\.\d+\.\d+$/.test(hostname);
+   const https=u.protocol==='https:'? '✅ Sí - HTTPS detectado' : '⚠️ No - HTTP sin cifrado';
+   let sospechas=[];
+   if(isIp) sospechas.push('Dominio es una IP');
+   if(hostname.split('.').length>4) sospechas.push('Muchos subdominios');
+   if(v.includes('@') &&!raw.startsWith('@')) sospechas.push('Contiene @ sospechoso');
+   return {raw:raw,type:'web',domain:hostname,https:https, sospechas:sospechas, urlObj:u};
+ }catch(e){
+   return {raw:raw,type:'unknown',domain:raw,https:'❓ No pudimos comprobarlo',sospechas:[]};
+ }
+}
+
+function renderDomainCard(info){
+ const card=document.getElementById('domainCard');
+ if(!info ||!info.domain){
+   card.innerHTML='<div class="domain-item"><span>Dominio analizado</span><b>❓ No disponible</b></div>';
+   return;
+ }
+ let html='';
+ html+='<div class="domain-item"><span>Dominio analizado</span><b>'+info.domain+'</b></div>';
+ html+='<div class="domain-item"><span>HTTPS</span><b>'+info.https+'</b></div>';
+ html+='<div class="domain-item"><span>Antigüedad del dominio</span><b>❓ No disponible <span style="font-weight:400">- requiere API WHOIS no implementada</span></b></div>';
+ html+='<div class="domain-item"><span>Redirecciones sospechosas</span><b>❓ No disponible <span style="font-weight:400">- requiere backend</span></b></div>';
+ html+='<div class="domain-item"><span>Coincidencia nombre tienda vs dominio</span><b>ℹ️ Información proporcionada por el usuario</b></div>';
+ if(info.sospechas && info.sospechas.length>0){
+   html+='<div class="domain-item" style="border-color:#FCA5A5;background:#FEF2F2"><span>Patrones extra</span><b>⚠️ '+info.sospechas.join(', ')+'</b></div>';
+ }
+ card.innerHTML=html;
+}
+
+// Evaluar
+document.getElementById('btnEvaluar').onclick=function(){
+ var riskIds=['c1','c2','c3','c4','c5'];
+ var posIds=['c6','c7','c8'];
+ var riskCount=0,posCount=0;
+ var checks=[];
+ riskIds.forEach(id=>{var el=document.getElementById(id); if(el.checked){riskCount++; checks.push({type:'risk',el:el});}});
+ posIds.forEach(id=>{var el=document.getElementById(id); if(el.checked){posCount++; checks.push({type:'pos',el:el});}});
+
+ var rawUrl=document.getElementById('url').value.trim();
+ var domainInfo=parseDomain(rawUrl);
+ renderDomainCard(domainInfo);
+
+ var res=document.getElementById('res');
+ var head=document.getElementById('resHead');
+ res.style.display='block';
+
+ var nivel='',colorBg='',icon='',todo=[];
+ var stateHtml='';
+
+ if(!rawUrl && riskCount===0 && posCount===0){
+   nivel='⚪ Información insuficiente'; colorBg='#F8FAFC'; icon='⚪';
+   stateHtml='<span class="state">❓ No disponible - Pegá un enlace y tildá señales</span>';
+   todo=['Pegá un enlace para analizar el dominio','Tildá las señales que observes en la tienda','Buscá el CUIT oficial si la tienda lo muestra'];
+ } else if(riskCount>=3){
+   nivel='🔴 Riesgo alto - '+riskCount+' señales'; colorBg='#FEF2F2'; icon='🔴';
+   stateHtml='<span class="state">⚠️ Señal de riesgo - '+riskCount+' tildadas</span><span class="state">ℹ️ Info aportada por vos</span>';
+   todo=['No pagues hasta verificar redes oficiales','Buscá el CUIT en AFIP si lo proporciona y compará razón social','Buscá experiencias de otros compradores debajo','Compará el dominio con Instagram/TikTok oficial de la marca','Evitá transferir si solo acepta transferencia y apura'];
+ } else if(riskCount>=1){
+   nivel='🟡 Riesgo moderado - '+riskCount+' señal(es)'; colorBg='#FFFBEB'; icon='🟡';
+   stateHtml='<span class="state">⚠️ Señal de riesgo - moderada</span><span class="state">ℹ️ Info aportada por vos</span>';
+   todo=['Verificá redes y antigüedad de publicaciones','Pedí factura y datos de CUIT','Pagá con método con protección si podés','Revisá experiencias de la comunidad'];
+ } else if(posCount>=1){
+   nivel='🟢 Bajo riesgo aparente'; colorBg='#F0FDF4'; icon='🟢';
+   stateHtml='<span class="state">✅ Comprobado por vos - señales positivas</span><span class="state">❓ Dominio - Verificación limitada sin backend</span>';
+   todo=['Igual verificá que el dominio coincida con redes oficiales','Guardá comprobantes','Revisá políticas de cambio antes de pagar'];
+ } else {
+   nivel='⚪ Información insuficiente para calificar'; colorBg='#F8FAFC'; icon='⚪';
+   stateHtml='<span class="state">❓ No disponible - Faltan señales</span><span class="state">ℹ️ Pegaste: '+(domainInfo?domainInfo.domain:'sin dominio')+'</span>';
+   todo=['Tildá lo que veas en la tienda para mejorar el análisis','Buscá el Instagram oficial y compará seguidores y comentarios','No compartas datos sensibles hasta estar seguro'];
+ }
+
+ head.style.background=colorBg;
+ document.getElementById('tit').innerHTML=nivel;
+ document.getElementById('kpiRisk').innerHTML=riskCount;
+ document.getElementById('kpiPos').innerHTML=posCount;
+ document.getElementById('score').innerHTML=(rawUrl?'Dominio: <b>'+ (domainInfo?domainInfo.domain:rawUrl) +'</b> • ':'')+'Análisis local en tu dispositivo - '+new Date().toLocaleString('es-AR');
+ document.getElementById('stateRow').innerHTML=stateHtml;
+
+ // Evidencia
+ var ev=document.getElementById('ev'); ev.innerHTML='';
+ var items=[];
+ if(rawUrl) items.push('<div class="domain-item"><span>✅ Comprobado</span><span>Dominio extraído: '+ (domainInfo?domainInfo.domain:'No disponible') +'</span></div>');
+ if(rawUrl) items.push('<div class="domain-item"><span>'+(domainInfo && domainInfo.https.includes('✅')?'✅ Comprobado':'⚠️ Señal de riesgo')+'</span><span>'+ (domainInfo?domainInfo.https:'No disponible') +'</span></div>');
+ riskIds.forEach(id=>{
+   var label=document.querySelector('label [id='+id+']')?.parentElement?.innerText || id;
+   var el=document.getElementById(id);
+   var txt=el.parentElement.querySelector('b')?.innerText || id;
+   if(el.checked) items.push('<div class="domain-item" style="border-color:#FECACA"><span>⚠️ Señal de riesgo</span><span>'+txt+' - ℹ️ Aportado por vos</span></div>');
+ });
+ posIds.forEach(id=>{
+   var el=document.getElementById(id);
+   var txt=el.parentElement.querySelector('b')?.innerText || id;
+   if(el.checked) items.push('<div class="domain-item" style="border-color:#BBF7D0"><span>✅ Señal positiva</span><span>'+txt+' - ℹ️ Aportado por vos</span></div>');
+ });
+ items.push('<div class="domain-item"><span>❓ No disponible</span><span>Antigüedad de dominio - requiere API WHOIS</span></div>');
+ items.push('<div class="domain-item"><span>❓ No disponible</span><span>CUIT oficial verificado automáticamente - requiere integración AFIP</span></div>');
+ ev.innerHTML=items.join('');
+
+ // Todo
+ var ul=document.getElementById('todoList'); ul.innerHTML='';
+ todo.forEach(t=>{var li=document.createElement('li');li.textContent=t;ul.appendChild(li);});
+
+ // Exp resumen para este dominio
+ renderExpSummaryForDomain(domainInfo?domainInfo.domain:rawUrl);
+
+ // Historial
+ saveHist(domainInfo?domainInfo.domain:rawUrl||'sin-dominio', nivel, icon);
+ renderHist();
+
+ // disclaimer
+ document.getElementById('disclaimerExtra').innerHTML=' Análisis realizado el '+new Date().toLocaleDateString('es-AR')+'. HTTPS y formato de dominio comprobados localmente. El resto es ℹ️ información proporcionada por el usuario y ❓ datos no disponibles sin backend.';
+
+ // scroll
+ res.scrollIntoView({behavior:'smooth',block:'start'});
 };
-var supabaseClient=null,mis=JSON.parse(localStorage.getItem('misReportes')||'[]');
-(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=function(){supabaseClient=supabase.createClient('https://ltaghuumilyjdzpmatqj.supabase.co','sb_publishable_KXmx7LEqpZ3g5u-iRMeyDA__bWJBbqH');cargar()};document.head.appendChild(s)})();
-async function cargar(){if(!supabaseClient)return;let r=await supabaseClient.from('experiencias').select('*').order('id',{ascending:false}).limit(40);if(!r.data)return;lista.innerHTML=r.data.map(x=>'<div style="padding:10px;border:1px solid #E2E8F0;border-radius:10px;margin-bottom:8px"><b>'+x.tienda+'</b> - '+(x.nombre||'Anónimo')+'<br><span style="font-size:12px">'+x.texto+'</span>'+(x.foto?'<br><img src="'+x.foto+'" style="width:100%;max-height:200px;border-radius:8px;margin-top:6px">':'')+'</div>').join('')}
-btnPub.onclick=async function(){let t=eT.value.trim(),x=eX.value.trim(),n=eN.value.trim()||'Anónimo';if(!t||!x){alert('Falta tienda o texto');return}let f=eF.files[0],foto=null;if(f)foto=await new Promise(r=>{let fr=new FileReader();fr.onload=e=>r(e.target.result);fr.readAsDataURL(f)});await supabaseClient.from('experiencias').insert([{nombre:n,tienda:t,texto:x,foto:foto}]);eT.value='';eX.value='';cargar()}
+
+function saveHist(domain, resultado, icon){
+ try{
+  var h=JSON.parse(localStorage.getItem('ss_hist')||'[]');
+  h.unshift({d:domain,r:resultado,i:icon,fecha:new Date().toISOString()});
+  h=h.slice(0,12);
+  localStorage.setItem('ss_hist',JSON.stringify(h));
+ }catch(e){}
+}
+function renderHist(){
+ var cont=document.getElementById('histList');
+ try{
+  var h=JSON.parse(localStorage.getItem('ss_hist')||'[]');
+  if(h.length===0){cont.innerHTML='Sin análisis previos';return}
+  cont.innerHTML=h.map(x=>'<div class="hist-item"><span><b>'+x.i+' '+x.d+'</b><br><span class="small">'+new Date(x.fecha).toLocaleString('es-AR')+'</span></span><span style="font-size:11px;text-align:right">'+x.r+'</span></div>').join('');
+ }catch(e){cont.innerHTML='Sin análisis previos'}
+}
+document.getElementById('btnClearHist').onclick=function(){localStorage.removeItem('ss_hist');renderHist();};
+renderHist();
+
+// Supabase - MANTENIDO ORIGINAL
+var supabaseClient=null;
+var misReportes=JSON.parse(localStorage.getItem('misReportes')||'[]');
+var todasExps=[];
+
+function loadSupabase(){
+ var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+ s.onload=function(){supabaseClient=supabase.createClient('https://ltaghuumilyjdzpmatqj.supabase.co','sb_publishable_KXmx7LEqpZ3g5u-iRMeyDA__bWJBbqH');cargarExps();};
+ document.head.appendChild(s);
+}
+loadSupabase();
+
+async function cargarExps(){
+ var cont=document.getElementById('listaExp');
+ var resumen=document.getElementById('resumenExp');
+ if(!supabaseClient){cont.innerHTML='Conectando...';return}
+ var r=await supabaseClient.from('experiencias').select('*').order('id',{ascending:false}).limit(80);
+ if(r.error){cont.innerHTML='Error: '+r.error.message;resumen.innerHTML='Error cargando resumen';return}
+ todasExps=r.data||[];
+ if(todasExps.length==0){
+   cont.innerHTML='<p class=small>Todavía no hay suficientes experiencias de la comunidad.</p>';
+   resumen.innerHTML='<b>👥 Experiencias de compradores</b><br><span class=small>Todavía no hay suficientes experiencias de la comunidad.</span>';
+   renderExpSummaryForDomain(null);
+   return;
+ }
+ // resumen global
+ var ok=todasExps.filter(x=>x.tipo==='ok' || (!x.tipo && x.texto && x.texto.toLowerCase().includes('bien'))).length;
+ var dud=todasExps.filter(x=>x.tipo==='dudosa').length;
+ var mal=todasExps.filter(x=>x.tipo==='mala').length;
+ resumen.innerHTML='<b>👥 Resumen de la comunidad (datos reales)</b><div class="state-row" style="margin-top:6px"><span class="state">🟢 Bien: '+ok+'</span><span class="state">🟡 Dudosa: '+dud+'</span><span class="state">🔴 Problemas: '+mal+'</span><span class="state">Total: '+todasExps.length+'</span></div><p class="small" style="margin-top:6px">No inventamos testimonios. Solo mostramos reportes reales de usuarios.</p>';
+
+ var html='';
+ for(var i=0;i<todasExps.length;i++){
+  var d=todasExps[i];
+  var img=''; if(d.foto){img='<img src="'+d.foto+'" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-top:8px">';}
+  var tipoIcon=d.tipo==='ok'?'🟢':d.tipo==='mala'?'🔴':d.tipo==='dudosa'?'🟡':'⚪';
+  var esMio=misReportes.indexOf(d.id)!==-1;
+  var btnDel=esMio?'<button class=del onclick="borrarExp('+d.id+')">🗑️ Borrar mi reporte</button>':'<span class=small> • Solo el autor puede borrarlo desde este dispositivo</span>';
+  html+='<div class=exp-card><b>'+tipoIcon+' '+escapeHtml(d.tienda)+'</b> <span class=small>• '+(escapeHtml(d.nombre)||'Anónimo')+'</span><div style="margin-top:6px;font-size:13px">'+escapeHtml(d.texto)+'</div>'+img+'<br>'+btnDel+'</div>';
+ }
+ cont.innerHTML=html;
+ renderExpSummaryForDomain(document.getElementById('url').value);
+}
+
+function escapeHtml(s){ if(!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderExpSummaryForDomain(domainRaw){
+ var cont=document.getElementById('resExpSum');
+ if(!cont) return;
+ if(!domainRaw || todasExps.length===0){
+   cont.innerHTML='Todavía no hay suficientes experiencias de la comunidad para este dominio.';
+   return;
+ }
+ var norm=domainRaw.toLowerCase().replace(/https?:\/\//,'').replace(/^www\./,'').split('/')[0].replace(/^@/,'');
+ var filtered=todasExps.filter(x=>{
+   var t=(x.tienda||'').toLowerCase();
+   return t.includes(norm) || norm.includes(t.replace(/@/g,''));
+ });
+ if(filtered.length===0){
+   cont.innerHTML='Todavía no hay suficientes experiencias de la comunidad para <b>'+escapeHtml(domainRaw)+'</b>. Sé el primero en reportar.';
+   return;
+ }
+ var ok=filtered.filter(x=>x.tipo==='ok').length;
+ var dud=filtered.filter(x=>x.tipo==='dudosa').length;
+ var mal=filtered.filter(x=>x.tipo==='mala').length;
+ cont.innerHTML='<div class="state-row"><span class="state">🟢 Bien: '+ok+'</span><span class="state">🟡 Dudosa: '+dud+'</span><span class="state">🔴 Problemas: '+mal+'</span></div><p style="margin-top:6px">'+filtered.length+' experiencias reales para este dominio. Los reportes son ℹ️ aportados por la comunidad, no verificados por SafeStore.</p>';
+}
+
+async function borrarExp(id){
+ if(!confirm('¿Borrar tu reporte? Esta acción no se puede deshacer.')) return;
+ var r=await supabaseClient.from('experiencias').delete().eq('id',id);
+ if(r.error){alert('Error: '+r.error.message);return}
+ misReportes=misReportes.filter(function(x){return x!==id;});
+ localStorage.setItem('misReportes',JSON.stringify(misReportes));
+ cargarExps();
+}
+window.borrarExp=borrarExp;
+
+document.getElementById('btnPub').onclick=async function(){
+ if(!supabaseClient){alert('Esperá 2 seg, cargando conexión...');return}
+ var tienda=document.getElementById('expTienda').value.trim();
+ var texto=document.getElementById('expTexto').value.trim();
+ var nombre=document.getElementById('expNombre').value.trim()||'Anónimo';
+ var tipo=document.getElementById('expTipo').value;
+ if(!tienda||!texto){alert('Completa tienda y qué pasó');return}
+ var btn=this;btn.innerHTML='Publicando...';btn.disabled=true;
+ var file=document.getElementById('expFoto').files[0];var foto=null;
+ if(file){foto=await new Promise(function(res){var r=new FileReader();r.onload=function(e){res(e.target.result);};r.readAsDataURL(file);});}
+ // Intentar con tipo y foto, fallback sin tipo si la tabla no tiene columna tipo aun
+ var payload={nombre:nombre,tienda:tienda,texto:texto,foto:foto,tipo:tipo};
+ var result=await supabaseClient.from('experiencias').insert([payload]).select();
+ if(result.error){
+   // fallback sin tipo
+   var payload2={nombre:nombre,tienda:tienda,texto:texto,foto:foto};
+   result=await supabaseClient.from('experiencias').insert([payload2]).select();
+   if(result.error){
+     // fallback sin foto
+     var payload3={nombre:nombre,tienda:tienda,texto:texto};
+     result=await supabaseClient.from('experiencias').insert([payload3]).select();
+   }
+ }
+ if(result.error){alert(result.error.message);}
+ else{
+  var nuevoId=result.data&&result.data[0]&&result.data[0].id;
+  if(nuevoId){misReportes.push(nuevoId);localStorage.setItem('misReportes',JSON.stringify(misReportes));}
+  document.getElementById('expTienda').value='';document.getElementById('expTexto').value='';document.getElementById('expFoto').value='';
+  cargarExps();
+ }
+ btn.innerHTML='Publicar experiencia';btn.disabled=false;
+};
 </script>
 </body>
 </html>
