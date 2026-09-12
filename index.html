@@ -4,12 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SafeStore - Verificá antes de pagar</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0F2C61">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="icon" href="/icon-192.png">
 <style>
-:root{--blue:#0F2C61;--blue2:#1E4BD8;--light:#F1F5F9;--ok:#16a34a;--mid:#d97706;--bad:#dc2626}
+:root{--blue:#0F2C61;--blue2:#1E4BD8;--light:#F1F5F9}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;background:var(--light);color:#1E293B;line-height:1.4}
 .top{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;padding:30px 20px 48px;text-align:center}
-.top h1{font-size:30px;font-weight:900;letter-spacing:-.5px}
+.top h1{font-size:30px;font-weight:900;letter-spacing:-.5px;display:flex;align-items:center;justify-content:center;gap:10px}
+.top h1 img{width:40px;height:40px;border-radius:10px}
 .top p.sub{margin-top:6px;font-size:15px;opacity:.9}
 .top p.claim{margin-top:14px;display:inline-block;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600}
 .wrap{max-width:760px;margin:-24px auto 0;padding:0 12px 50px}
@@ -17,137 +22,79 @@ body{font-family:apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;background:
 .hero-title{font-size:18px;font-weight:800}
 .hero-desc{font-size:13px;color:#64748B;margin-top:4px}
 .tab{display:flex;gap:8px;margin:16px 0}
-.tab button{flex:1;padding:12px;border-radius:12px;border:1.5px solid #BFDBFE;background:#EFF6FF;font-weight:700;cursor:pointer;transition:.2s}
-.tab button.active{background:var(--blue);color:#fff;border-color:var(--blue);transform:translateY(-1px)}
-.input{width:100%;padding:15px 14px;border-radius:14px;border:2px solid #BFDBFE;font-size:15px;outline:none;transition:.2s}
-.input:focus{border-color:var(--blue2);box-shadow:0 0 0 3px #DBEAFE}
+.tab button{flex:1;padding:12px;border-radius:12px;border:1.5px solid #BFDBFE;background:#EFF6FF;font-weight:700;cursor:pointer}
+.tab button.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.input{width:100%;padding:15px 14px;border-radius:14px;border:2px solid #BFDBFE;font-size:15px;outline:none}
+.input:focus{border-color:var(--blue2)}
 .section-label{font-size:12px;font-weight:800;color:#334155;letter-spacing:.5px;text-transform:uppercase;margin:18px 0 8px;display:flex;justify-content:space-between}
 .grid{display:grid;gap:8px}
-.check{position:relative;display:flex;gap:10px;padding:11px 12px;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:12px;font-size:13px;cursor:pointer;transition:.15s}
+.check{display:flex;gap:10px;padding:11px 12px;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:12px;font-size:13px;cursor:pointer}
 .check:has(input:checked){border-color:#93C5FD;background:#EFF6FF}
 .check.risk:has(input:checked){border-color:#FCA5A5;background:#FEF2F2}
 .check.pos:has(input:checked){border-color:#86EFAC;background:#F0FDF4}
-.check input{margin-top:2px}
-.check.auto{border-style:dashed; border-color:var(--blue2)}
-.why-btn{margin-left:auto;background:#fff;border:1px solid #E2E8F0;border-radius:999px;padding:2px 8px;font-size:11px;cursor:pointer;color:#475569}
+.why-btn{margin-left:auto;background:#fff;border:1px solid #E2E8F0;border-radius:999px;padding:2px 8px;font-size:11px;cursor:pointer}
 .why-box{display:none;margin-top:8px;padding:8px 10px;background:#fff;border:1px dashed #CBD5E1;border-radius:8px;font-size:12px;color:#475569}
 .why-box.open{display:block}
-.btn{width:100%;margin-top:14px;padding:15px;border-radius:14px;background:var(--blue);color:#fff;font-weight:800;border:0;cursor:pointer;font-size:15px;transition:.2s}
-.btn:active{transform:scale(.98)}
+.btn{width:100%;margin-top:14px;padding:15px;border-radius:14px;background:var(--blue);color:#fff;font-weight:800;border:0;cursor:pointer;font-size:15px}
 .btn2{background:#fff;color:var(--blue);border:2px solid var(--blue)}
 .res{margin-top:16px;border-radius:18px;padding:0;overflow:hidden;display:none;border:2px solid #E2E8F0}
 .res-head{padding:16px}
 .res-body{padding:14px;background:#fff}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800}
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .kpi{padding:10px;border-radius:12px;border:1px solid #E2E8F0;background:#F8FAFC}
 .kpi b{font-size:18px;display:block}
 .state-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.state{font-size:11px;padding:5px 8px;border-radius:999px;border:1px solid #E2E8F0;background:#fff;display:inline-flex;align-items:center;gap:4px}
+.state{font-size:11px;padding:5px 8px;border-radius:999px;border:1px solid #E2E8F0;background:#fff}
 .domain-card{margin-top:10px;display:grid;gap:6px}
 .domain-item{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid #E2E8F0;border-radius:10px;font-size:12px;background:#F8FAFC}
 .action-list{margin-top:8px;display:grid;gap:6px}
 .action-list li{list-style:none;padding:8px 10px;background:#F1F5F9;border-radius:10px;font-size:12px;border:1px solid #E2E8F0}
 .small{font-size:11px;color:#64748B}
-.exp-card{padding:12px;border:1px solid #E2E8F0;border-radius:14px;background:#fff;margin-bottom:10px;position:relative}
+.exp-card{padding:12px;border:1px solid #E2E8F0;border-radius:14px;background:#fff;margin-bottom:10px}
 .del{margin-top:8px;padding:6px 10px;border-radius:8px;border:1px solid #FECACA;background:#FEF2F2;color:#B91C1C;font-size:11px;cursor:pointer}
 .text{width:100%;padding:11px;border:1px solid #CBD5E1;border-radius:10px;margin-top:8px;font-size:13px}
-select.text{padding:11px}
 .hist-item{display:flex;justify-content:space-between;gap:8px;padding:10px;border:1px solid #E2E8F0;border-radius:10px;margin-bottom:6px;background:#fff;font-size:12px}
-.disclaimer{margin-top:12px;padding:10px 12px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;font-size:11px;color:#64748B}
 .hidden{display:none}
-.anim{animation:pop.25s ease}
-@keyframes pop{from{transform:translateY(4px);opacity:0}to{transform:translateY(0);opacity:1}}
-.loader{width:14px;height:14px;border:2px solid #CBD5E1;border-top-color:var(--blue2);border-radius:50%;display:inline-block;animation:spin.8s linear infinite}
+.loader{width:14px;height:14px;border:2px solid #CBD5E1;border-top-color:#1E4BD8;border-radius:50%;display:inline-block;animation:spin.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 <div class="top">
-<h1>🛡️ SafeStore</h1>
+<h1><img src="/icon-192.png"> SafeStore</h1>
 <p class="sub">Antes de comprar, verificá.</p>
-<p class="sub" style="font-size:13px;margin-top:2px">Ahora con análisis automático de dominio y CUIT.</p>
-<p class="claim">No afirmamos estafas. Mostramos señales comprobables.</p>
+<p class="sub" style="font-size:13px;margin-top:2px">Ahora con AutoScan de dominio y CUIT + App instalable.</p>
+<p class="claim">No afirmamos estafas sin evidencia. Mostramos señales comprobables.</p>
 </div>
-
 <div class="wrap">
 <div class="card">
 <div class="tab"><button id="btnTabWeb" class="active">🌐 Analizar enlace</button><button id="btnTabExp">📸 Comunidad</button></div>
-
 <div id="seccionWeb">
 <div class="hero-title">Verificá antes de pagar</div>
-<div class="hero-desc">Pegá el link y SafeStore ahora verifica antigüedad del dominio y CUIT automáticamente. Lo que no se puede verificar automáticamente, lo tildás vos.</div>
-
-<input id="url" class="input" placeholder="Pega link ej: aurelius.com.ar o @tienda" style="margin-top:14px">
-<input id="cuitManual" class="input" placeholder="¿La tienda muestra CUIT? Pegalo acá ej: 20-12345678-3 (opcional)" style="margin-top:8px;border-style:dashed">
-
+<div class="hero-desc">Pegá el link. SafeStore verifica antigüedad del dominio y CUIT automáticamente.</div>
+<input id="url" class="input" placeholder="Pega link ej: tienda.com o @tienda" style="margin-top:14px">
+<input id="cuitManual" class="input" placeholder="¿Muestra CUIT? Pegalo acá ej: 20-12345678-6 (opcional)" style="margin-top:8px;border-style:dashed">
 <div class="section-label"><span>⚠️ Señales de riesgo</span><span class="small">Auto + manual</span></div>
-<div class="grid" id="riskChecks">
-<label class="check risk"><input type="checkbox" id="c1"><span><b>Solo acepta transferencia / cripto</b></span><button class="why-btn" data-w="w1">ⓘ ¿Por qué?</button><div class="why-box" id="w1">Evitan métodos con protección al comprador. No es prueba de estafa por sí solo, pero es señal de riesgo alta.</div></label>
-<label class="check risk"><input type="checkbox" id="c2"><span><b>No muestra CUIT ni domicilio</b></span><button class="why-btn" data-w="w2">ⓘ ¿Por qué?</button><div class="why-box" id="w2">En Argentina un comercio real suele mostrar razón social, CUIT y domicilio.</div></label>
-<label class="check risk"><input type="checkbox" id="c3"><span><b>Precios 60% más baratos y apura a pagar</b></span><button class="why-btn" data-w="w3">ⓘ ¿Por qué?</button><div class="why-box" id="w3">Descuentos irreales + urgencia es técnica común para que no verifiques.</div></label>
-<label class="check risk"><input type="checkbox" id="c4"><span><b>Sin política de cambios / devoluciones</b></span><button class="why-btn" data-w="w4">ⓘ ¿Por qué?</button><div class="why-box" id="w4">Deja al comprador sin protección si el producto no llega.</div></label>
-<label class="check risk"><input type="checkbox" id="c5"><span><b>Fotos robadas, reseñas sin foto o solo WhatsApp</b></span><button class="why-btn" data-w="w5">ⓘ ¿Por qué?</button><div class="why-box" id="w5">Usan fotos de otras marcas y solo atienden por privado para no dejar registro público.</div></label>
+<div class="grid">
+<label class="check risk"><input type="checkbox" id="c1"><span><b>Solo acepta transferencia / cripto</b></span><button class="why-btn" data-w="w1">ⓘ</button><div class="why-box" id="w1">Evitan métodos con protección.</div></label>
+<label class="check risk"><input type="checkbox" id="c2"><span><b>No muestra CUIT ni domicilio</b></span><button class="why-btn" data-w="w2">ⓘ</button><div class="why-box" id="w2">Comercio real suele mostrar CUIT.</div></label>
+<label class="check risk"><input type="checkbox" id="c3"><span><b>Precios 60% más baratos y apura a pagar</b></span><button class="why-btn" data-w="w3">ⓘ</button><div class="why-box" id="w3">Descuentos irreales + urgencia.</div></label>
+<label class="check risk"><input type="checkbox" id="c4"><span><b>Sin política de cambios</b></span></label>
+<label class="check risk"><input type="checkbox" id="c5"><span><b>Fotos robadas o solo WhatsApp</b></span></label>
 </div>
-
 <div class="section-label"><span>✅ Señales positivas</span></div>
 <div class="grid">
-<label class="check pos"><input type="checkbox" id="c6"><span><b>Muestra CUIT y podés verificarlo en AFIP</b></span><button class="why-btn" data-w="w6">ⓘ ¿Por qué?</button><div class="why-box" id="w6">Si muestra CUIT, podés buscarlo en constancia de AFIP.</div></label>
-<label class="check pos"><input type="checkbox" id="c7"><span><b>Tiene políticas claras y medios de pago con protección</b></span><button class="why-btn" data-w="w7">ⓘ ¿Por qué?</button><div class="why-box" id="w7">MercadoPago, tarjeta, etc. dan más trazabilidad.</div></label>
-<label class="check pos"><input type="checkbox" id="c8"><span><b>Redes activas, reseñas reales y antigüedad visible</b></span><button class="why-btn" data-w="w8">ⓘ ¿Por qué?</button><div class="why-box" id="w8">Presencia sostenida en el tiempo es señal positiva, pero no garantiza seguridad.</div></label>
+<label class="check pos"><input type="checkbox" id="c6"><span><b>Muestra CUIT verificable</b></span></label>
+<label class="check pos"><input type="checkbox" id="c7"><span><b>Medios de pago con protección</b></span></label>
+<label class="check pos"><input type="checkbox" id="c8"><span><b>Redes activas y antigüedad visible</b></span></label>
 </div>
-
 <button class="btn" id="btnEvaluar">🔍 Analizar con AutoScan</button>
-<button class="btn btn2" id="btnBorrar" style="display:none;margin-top:8px">🗑️ Borrar todo</button>
-
-<div id="res" class="res anim">
-<div class="res-head" id="resHead">
-<h2 id="tit" style="font-size:18px"></h2>
-<p id="score" class="small" style="margin-top:4px"></p>
-<div class="state-row" id="stateRow"></div>
+<button class="btn btn2" id="btnBorrar" style="display:none;margin-top:8px">🗑️ Borrar</button>
+<div id="res" class="res"><div class="res-head" id="resHead"><h2 id="tit" style="font-size:18px"></h2><p id="score" class="small" style="margin-top:4px"></p><div class="state-row" id="stateRow"></div></div><div class="res-body"><div class="kpis"><div class="kpi"><span class="small">Riesgo</span><b id="kpiRisk">0</b></div><div class="kpi"><span class="small">Positivas</span><b id="kpiPos">0</b></div></div><div style="margin-top:14px"><b style="font-size:13px">🔎 Análisis automático</b><div class="domain-card" id="domainCard"></div></div><div style="margin-top:14px"><b style="font-size:13px">📋 Detalle</b><div id="ev" style="margin-top:8px;display:grid;gap:6px"></div></div><div style="margin-top:14px"><b style="font-size:13px">👥 Comunidad</b><div id="resExpSum" class="small">Analizando...</div></div><div style="margin-top:14px"><b style="font-size:13px">👉 Qué hacer</b><ul id="todoList" class="action-list"></ul></div></div></div>
+<div id="historialBox" style="margin-top:18px"><div class="section-label"><span>🕓 Historial local</span><button class="why-btn" id="btnClearHist">Borrar</button></div><div id="histList" class="small">Sin análisis previos</div></div>
 </div>
-<div class="res-body">
-<div class="kpis">
-<div class="kpi"><span class="small">Riesgo</span><b id="kpiRisk">0</b><span class="small">Auto + manual</span></div>
-<div class="kpi"><span class="small">Positivas</span><b id="kpiPos">0</b><span class="small">Aportadas por vos</span></div>
-</div>
-
-<div style="margin-top:14px">
-<b style="font-size:13px">🔎 Análisis automático (nuevo)</b>
-<div class="domain-card" id="domainCard"></div>
-</div>
-
-<div style="margin-top:14px">
-<b style="font-size:13px">📋 Detalle de verificación</b>
-<div id="ev" style="margin-top:8px;display:grid;gap:6px"></div>
-</div>
-
-<div style="margin-top:14px">
-<b style="font-size:13px">👥 Comunidad para este dominio</b>
-<div id="resExpSum" style="margin-top:6px" class="small">Analizando...</div>
-</div>
-
-<div style="margin-top:14px">
-<b style="font-size:13px">👉 Qué hacer ahora</b>
-<ul id="todoList" class="action-list"></ul>
-</div>
-
-<div class="disclaimer">
-<b>Transparencia:</b> SafeStore analiza señales visibles. No garantizamos estafa o seguridad 100%.
-<span id="disclaimerExtra"></span>
-</div>
-</div>
-</div>
-
-<div id="historialBox" style="margin-top:18px">
-<div class="section-label"><span>🕓 Historial local</span><button class="why-btn" id="btnClearHist">Borrar</button></div>
-<div id="histList" class="small">Sin análisis previos</div>
-</div>
-</div>
-
 <div id="seccionExp" class="hidden">
-<h3 style="font-size:16px">📸 Experiencias de compradores</h3>
-<p class="small" style="margin-top:4px">Contá tu experiencia real. Solo el autor puede borrar su reporte desde este dispositivo.</p>
+<h3 style="font-size:16px">📸 Experiencias</h3>
 <select id="expTipo" class="text"><option value="ok">🟢 Compré y salió bien</option><option value="dudosa">🟡 Dudosa</option><option value="mala">🔴 Tuve problemas</option></select>
 <input id="expNombre" class="text" placeholder="Tu nombre (opcional)">
 <input id="expTienda" class="text" placeholder="Tienda o @usuario">
@@ -157,46 +104,35 @@ select.text{padding:11px}
 <div id="resumenExp" class="card" style="margin-top:14px;padding:12px;background:#F8FAFC"></div>
 <div id="listaExp" style="margin-top:14px">Cargando...</div>
 </div>
-
 </div>
 </div>
-
 <script>
-// TABS
 document.getElementById('btnTabWeb').onclick=function(){document.getElementById('btnTabWeb').className='active';document.getElementById('btnTabExp').className='';document.getElementById('seccionWeb').className='';document.getElementById('seccionExp').className='hidden';};
 document.getElementById('btnTabExp').onclick=function(){document.getElementById('btnTabExp').className='active';document.getElementById('btnTabWeb').className='';document.getElementById('seccionExp').className='';document.getElementById('seccionWeb').className='hidden';};
 document.addEventListener('click',function(e){ if(e.target.classList.contains('why-btn') && e.target.dataset.w){ var box=document.getElementById(e.target.dataset.w); if(box) box.classList.toggle('open'); }});
-
-// --- NUEVO: CUIT LOGIC ---
 function limpiarCUIT(c){ return (c||'').replace(/[^0-9]/g,''); }
 function validarCUIT(cuit){
   let c=limpiarCUIT(cuit); if(c.length!=11) return {ok:false, msg:'Debe tener 11 dígitos'};
   let mult=[5,4,3,2,7,6,5,4,3,2]; let suma=0;
   for(let i=0;i<10;i++) suma+=parseInt(c[i])*mult[i];
   let ver=11-(suma%11); if(ver==11) ver=0; if(ver==10) ver=9;
-  if(ver==parseInt(c[10])) return {ok:true, msg:'CUIT válido matemáticamente (dígito verificador correcto)',cuit:c};
-  return {ok:false, msg:'CUIT inválido (dígito verificador no coincide)'};
+  if(ver==parseInt(c[10])) return {ok:true, msg:'CUIT válido (dígito verificador correcto)',cuit:c};
+  return {ok:false, msg:'CUIT inválido (dígito no coincide)'};
 }
-
-// --- NUEVO: RDAP / DOMAIN AGE ---
 async function fetchDomainAge(domain){
   if(!domain || domain.includes('@') || domain.length<3) return {status:'no_aplica', msg:'Usuario social'};
   try{
-    // rdap.org es proxy público que no necesita key
     const res= await fetch('https://rdap.org/domain/'+domain, {headers:{'Accept':'application/json'}});
     if(!res.ok) throw new Error('rdap no ok');
     const data= await res.json();
     let ev=data.events||[];
     let reg=ev.find(e=>e.eventAction==='registration');
-    if(!reg) return {status:'desconocido', msg:'No se encontró fecha'};
+    if(!reg) return {status:'desconocido', msg:'Sin fecha'};
     let fecha=new Date(reg.eventDate);
     let dias=Math.floor((Date.now()-fecha)/86400000);
-    return {status:'ok', fecha:fecha, dias:dias, raw:reg.eventDate};
-  }catch(e){
-    return {status:'error', msg:'No se pudo consultar antigüedad (CORS/bloqueo). Probá con VPN o backend.'};
-  }
+    return {status:'ok', fecha:fecha, dias:dias};
+  }catch(e){ return {status:'error', msg:'No se pudo consultar (requiere backend para evitar CORS)'}; }
 }
-
 function parseDomain(raw){
  if(!raw) return null;
  let v=raw.trim(); if(v.startsWith('@')) return {raw:v,type:'social',domain:v,https:'❓ No aplica'};
@@ -205,206 +141,116 @@ function parseDomain(raw){
    const u=new URL(v); const hostname=u.hostname.toLowerCase().replace(/^www\./,'');
    const https=u.protocol==='https:'? '✅ Sí - HTTPS': '⚠️ No - HTTP';
    let sospechas=[]; if(/^\d+\.\d+\.\d+\.\d+$/.test(hostname)) sospechas.push('IP directa');
-   if(hostname.split('.').length>4) sospechas.push('Muchos subdominios');
    return {raw:raw,type:'web',domain:hostname,https:https, sospechas:sospechas};
  }catch(e){ return {raw:raw,type:'unknown',domain:raw,https:'❓'}; }
 }
-
-// AUTO SCAN al escribir
 let scanTimeout=null;
 document.getElementById('url').oninput=function(){
  document.getElementById('btnBorrar').style.display=this.value.length>0?'block':'none';
  clearTimeout(scanTimeout);
- if(this.value.length>4){
-   scanTimeout=setTimeout(()=>{ document.getElementById('btnEvaluar').click(); }, 800);
- }
+ if(this.value.length>4){ scanTimeout=setTimeout(()=>{ document.getElementById('btnEvaluar').click(); }, 800); }
 };
 document.getElementById('btnBorrar').onclick=function(){
  document.getElementById('url').value=''; document.getElementById('cuitManual').value='';
  document.getElementById('res').style.display='none'; this.style.display='none';
  document.querySelectorAll('#seccionWeb input[type=checkbox]').forEach(c=>c.checked=false);
 };
-
 async function renderDomainCard(info, ageInfo, cuitInfo){
  const card=document.getElementById('domainCard');
  if(!info){ card.innerHTML='<div class="domain-item"><span>Dominio</span><b>❓</b></div>'; return; }
- let html='';
- html+='<div class="domain-item"><span>Dominio</span><b>'+info.domain+'</b></div>';
+ let html=''; html+='<div class="domain-item"><span>Dominio</span><b>'+info.domain+'</b></div>';
  html+='<div class="domain-item"><span>HTTPS</span><b>'+info.https+'</b></div>';
  if(ageInfo){
    if(ageInfo.status==='ok'){
      let color=ageInfo.dias<30?'#FEF2F2':ageInfo.dias<90?'#FFFBEB':'#F0FDF4';
      let border=ageInfo.dias<30?'#FCA5A5':ageInfo.dias<90?'#FDE68A':'#86EFAC';
      let icono=ageInfo.dias<30?'🔴':ageInfo.dias<90?'🟡':'🟢';
-     html+='<div class="domain-item" style="background:'+color+';border-color:'+border+'"><span>'+icono+' Antigüedad</span><b>Creado hace '+ageInfo.dias+' días ('+ageInfo.fecha.toLocaleDateString('es-AR')+')</b></div>';
-   } else {
-     html+='<div class="domain-item"><span>Antigüedad</span><b>'+(ageInfo.msg||'No disponible')+' <span class="loader"></span></b></div>';
-   }
- } else {
-   html+='<div class="domain-item"><span>Antigüedad</span><b><span class="loader"></span> Consultando RDAP...</b></div>';
- }
+     html+='<div class="domain-item" style="background:'+color+';border-color:'+border+'"><span>'+icono+' Antigüedad</span><b>'+ageInfo.dias+' días ('+ageInfo.fecha.toLocaleDateString('es-AR')+')</b></div>';
+   } else { html+='<div class="domain-item"><span>Antigüedad</span><b>'+ageInfo.msg+'</b></div>'; }
+ } else { html+='<div class="domain-item"><span>Antigüedad</span><b><span class="loader"></span> Consultando...</b></div>'; }
  if(cuitInfo){
    let color=cuitInfo.ok?'#F0FDF4':'#FEF2F2'; let border=cuitInfo.ok?'#86EFAC':'#FCA5A5';
    html+='<div class="domain-item" style="background:'+color+';border-color:'+border+'"><span>'+(cuitInfo.ok?'✅':'❌')+' CUIT</span><b>'+cuitInfo.msg+'</b></div>';
-   if(cuitInfo.ok) html+='<div class="domain-item"><span>AFIP</span><b><a href="https://www.afip.gob.ar/genericos/constanciaDeCuil/constanciaDeCuil.asp" target="_blank">Verificar en AFIP →</a> '+cuitInfo.cuit+'</b></div>';
- } else {
-   html+='<div class="domain-item"><span>CUIT</span><b>ℹ️ No ingresado. Si la tienda muestra CUIT, pegalo arriba para validarlo.</b></div>';
- }
- if(info.sospechas && info.sospechas.length>0){
-   html+='<div class="domain-item" style="border-color:#FCA5A5;background:#FEF2F2"><span>Patrones</span><b>⚠️ '+info.sospechas.join(', ')+'</b></div>';
- }
+ } else { html+='<div class="domain-item"><span>CUIT</span><b>ℹ️ No ingresado</b></div>'; }
  card.innerHTML=html;
 }
-
 document.getElementById('btnEvaluar').onclick=async function(){
  var riskIds=['c1','c2','c3','c4','c5']; var posIds=['c6','c7','c8'];
  var riskCount=0,posCount=0;
  riskIds.forEach(id=>{ if(document.getElementById(id).checked) riskCount++; });
  posIds.forEach(id=>{ if(document.getElementById(id).checked) posCount++; });
-
  var rawUrl=document.getElementById('url').value.trim();
  var cuitRaw=document.getElementById('cuitManual').value.trim();
  var domainInfo=parseDomain(rawUrl);
  var cuitInfo=cuitRaw? validarCUIT(cuitRaw): null;
  var ageInfo=null;
-
  document.getElementById('res').style.display='block';
  document.getElementById('resHead').style.background='#F8FAFC';
  document.getElementById('tit').innerHTML='⏳ Analizando...';
  await renderDomainCard(domainInfo, null, cuitInfo);
-
  if(domainInfo && domainInfo.type==='web'){
    ageInfo=await fetchDomainAge(domainInfo.domain);
-   // AUTO TILDADO INTELIGENTE
-   if(ageInfo.status==='ok' && ageInfo.dias<90){
-     riskCount++; // suma riesgo por dominio nuevo
-   }
-   if(cuitInfo &&!cuitInfo.ok){
-     document.getElementById('c2').checked=true; riskCount++;
-   }
-   if(cuitInfo && cuitInfo.ok){
-     document.getElementById('c6').checked=true; posCount++;
-   }
+   if(ageInfo.status==='ok' && ageInfo.dias<90) riskCount++;
+   if(cuitInfo &&!cuitInfo.ok){ document.getElementById('c2').checked=true; riskCount++; }
+   if(cuitInfo && cuitInfo.ok){ document.getElementById('c6').checked=true; posCount++; }
  }
-
  await renderDomainCard(domainInfo, ageInfo, cuitInfo);
-
- var res=document.getElementById('res'); var head=document.getElementById('resHead');
- var nivel='',colorBg='',icon='',todo=[]; var stateHtml='';
-
+ var head=document.getElementById('resHead');
  let scoreAuto=0;
- if(ageInfo && ageInfo.status==='ok'){
-   if(ageInfo.dias<15) scoreAuto+=40;
-   else if(ageInfo.dias<90) scoreAuto+=25;
- }
+ if(ageInfo && ageInfo.status==='ok'){ if(ageInfo.dias<15) scoreAuto+=40; else if(ageInfo.dias<90) scoreAuto+=25; }
  if(cuitInfo &&!cuitInfo.ok) scoreAuto+=25;
  if(riskCount>0) scoreAuto+=riskCount*15;
  if(cuitInfo && cuitInfo.ok) scoreAuto-=20;
  if(posCount>0) scoreAuto-=posCount*10;
  scoreAuto=Math.max(0,Math.min(100,scoreAuto));
-
- if(!rawUrl && riskCount===0 && posCount===0){
-   nivel='⚪ Información insuficiente'; colorBg='#F8FAFC'; icon='⚪';
-   stateHtml='<span class="state">❓ Pegá un enlace</span>';
-   todo=['Pegá un enlace y si tiene CUIT pegalo también'];
- } else if(scoreAuto>=50 || riskCount>=3){
-   nivel='🔴 Riesgo alto - '+scoreAuto+'/100'; colorBg='#FEF2F2'; icon='🔴';
-   stateHtml='<span class="state">⚠️ AutoScan: Riesgo alto</span><span class="state">🕓 Dominio: '+(ageInfo? (ageInfo.dias+' días'):'no disponible')+'</span>';
-   todo=['No transfieras. Pedí CUIT y verificá en AFIP','Si el dominio tiene <90 días, es muy sospechoso','Buscá el Instagram oficial y compará','Pagá solo con protección'];
- } else if(scoreAuto>=25 || riskCount>=1){
-   nivel='🟡 Riesgo moderado - '+scoreAuto+'/100'; colorBg='#FFFBEB'; icon='🟡';
-   stateHtml='<span class="state">⚠️ Riesgo moderado</span><span class="state">✅ CUIT: '+(cuitInfo? (cuitInfo.ok?'válido':'inválido'):'no ingresado')+'</span>';
-   todo=['Verificá redes y antigüedad','Pedí factura','Pagá con método con protección'];
- } else {
-   nivel='🟢 Bajo riesgo aparente - '+scoreAuto+'/100'; colorBg='#F0FDF4'; icon='🟢';
-   stateHtml='<span class="state">✅ Bajo riesgo según señales</span><span class="state">🕓 Antigüedad OK</span>';
-   todo=['Igual verificá que el dominio coincida con redes oficiales','Guardá comprobantes'];
- }
-
+ var nivel='',colorBg='',icon='',todo=[],stateHtml='';
+ if(scoreAuto>=50 || riskCount>=3){ nivel='🔴 Riesgo alto - '+scoreAuto+'/100'; colorBg='#FEF2F2'; icon='🔴'; todo=['No transfieras','Verificá CUIT en AFIP','Si tiene <90 días es muy sospechoso']; }
+ else if(scoreAuto>=25 || riskCount>=1){ nivel='🟡 Riesgo moderado - '+scoreAuto+'/100'; colorBg='#FFFBEB'; icon='🟡'; todo=['Verificá redes','Pedí factura','Pagá con protección']; }
+ else { nivel='🟢 Bajo riesgo - '+scoreAuto+'/100'; colorBg='#F0FDF4'; icon='🟢'; todo=['Igual verificá dominio','Guardá comprobantes']; }
  head.style.background=colorBg;
  document.getElementById('tit').innerHTML=nivel;
  document.getElementById('kpiRisk').innerHTML=riskCount+' ('+scoreAuto+')';
  document.getElementById('kpiPos').innerHTML=posCount;
  document.getElementById('score').innerHTML=(domainInfo? 'Dominio: <b>'+domainInfo.domain+'</b> • ':'')+new Date().toLocaleString('es-AR');
- document.getElementById('stateRow').innerHTML=stateHtml;
-
- var ev=document.getElementById('ev'); ev.innerHTML='';
- let items=[];
- if(domainInfo) items.push('<div class="domain-item"><span>✅ Comprobado</span><span>Dominio: '+domainInfo.domain+'</span></div>');
- if(ageInfo && ageInfo.status==='ok') items.push('<div class="domain-item" style="border-color:'+(ageInfo.dias<90?'#FCA5A5':'#86EFAC')+'"><span>'+(ageInfo.dias<90?'⚠️ Auto':'✅ Auto')+'</span><span>Antigüedad: '+ageInfo.dias+' días - '+ageInfo.fecha.toLocaleDateString('es-AR')+'</span></div>');
- else if(ageInfo) items.push('<div class="domain-item"><span>❓ Auto</span><span>Antigüedad: '+ageInfo.msg+'</span></div>');
- if(cuitInfo) items.push('<div class="domain-item" style="border-color:'+(cuitInfo.ok?'#86EFAC':'#FCA5A5')+'"><span>'+(cuitInfo.ok?'✅ Auto':'❌ Auto')+'</span><span>CUIT: '+cuitInfo.msg+'</span></div>');
- riskIds.concat(posIds).forEach(id=>{
-   var el=document.getElementById(id); if(!el.checked) return;
-   var txt=el.parentElement.querySelector('b')?.innerText||id;
-   items.push('<div class="domain-item"><span>ℹ️ Manual</span><span>'+txt+'</span></div>');
- });
+ document.getElementById('stateRow').innerHTML='<span class="state">'+nivel+'</span>';
+ var ev=document.getElementById('ev'); let items=[];
+ if(domainInfo) items.push('<div class="domain-item"><span>✅</span><span>Dominio: '+domainInfo.domain+'</span></div>');
+ if(ageInfo && ageInfo.status==='ok') items.push('<div class="domain-item"><span>✅ Auto</span><span>'+ageInfo.dias+' días</span></div>');
+ if(cuitInfo) items.push('<div class="domain-item"><span>'+(cuitInfo.ok?'✅':'❌')+'</span><span>'+cuitInfo.msg+'</span></div>');
  ev.innerHTML=items.join('');
-
- var ul=document.getElementById('todoList'); ul.innerHTML='';
- todo.forEach(t=>{var li=document.createElement('li');li.textContent=t;ul.appendChild(li);});
-
+ var ul=document.getElementById('todoList'); ul.innerHTML=''; todo.forEach(t=>{var li=document.createElement('li');li.textContent=t;ul.appendChild(li);});
  renderExpSummaryForDomain(domainInfo?domainInfo.domain:rawUrl);
  saveHist(domainInfo?domainInfo.domain:rawUrl||'sin-dominio', nivel, icon);
  renderHist();
- document.getElementById('disclaimerExtra').innerHTML=' Análisis con RDAP público + validación CUIT local. Fecha: '+new Date().toLocaleDateString('es-AR')+'.';
- res.scrollIntoView({behavior:'smooth',block:'start'});
 };
-
-function saveHist(domain, resultado, icon){
- try{ var h=JSON.parse(localStorage.getItem('ss_hist')||'[]'); h.unshift({d:domain,r:resultado,i:icon,fecha:new Date().toISOString()}); h=h.slice(0,12); localStorage.setItem('ss_hist',JSON.stringify(h)); }catch(e){}
-}
-function renderHist(){
- var cont=document.getElementById('histList');
- try{
-  var h=JSON.parse(localStorage.getItem('ss_hist')||'[]');
-  if(h.length===0){cont.innerHTML='Sin análisis previos';return}
-  cont.innerHTML=h.map(x=>'<div class="hist-item"><span><b>'+x.i+' '+x.d+'</b><br><span class="small">'+new Date(x.fecha).toLocaleString('es-AR')+'</span></span><span style="font-size:11px;text-align:right">'+x.r+'</span></div>').join('');
- }catch(e){cont.innerHTML='Sin análisis previos'}
-}
-document.getElementById('btnClearHist').onclick=function(){localStorage.removeItem('ss_hist');renderHist();};
-renderHist();
-
-// Supabase igual
+function saveHist(domain, resultado, icon){ try{ var h=JSON.parse(localStorage.getItem('ss_hist')||'[]'); h.unshift({d:domain,r:resultado,i:icon,fecha:new Date().toISOString()}); h=h.slice(0,12); localStorage.setItem('ss_hist',JSON.stringify(h)); }catch(e){} }
+function renderHist(){ var cont=document.getElementById('histList'); try{ var h=JSON.parse(localStorage.getItem('ss_hist')||'[]'); if(h.length===0){cont.innerHTML='Sin análisis previos';return} cont.innerHTML=h.map(x=>'<div class="hist-item"><span><b>'+x.i+' '+x.d+'</b><br><span class="small">'+new Date(x.fecha).toLocaleString('es-AR')+'</span></span><span style="font-size:11px;text-align:right">'+x.r+'</span></div>').join(''); }catch(e){cont.innerHTML='Sin análisis previos'} }
+document.getElementById('btnClearHist').onclick=function(){localStorage.removeItem('ss_hist');renderHist();}; renderHist();
 var supabaseClient=null; var misReportes=JSON.parse(localStorage.getItem('misReportes')||'[]'); var todasExps=[];
 function loadSupabase(){ var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'; s.onload=function(){supabaseClient=supabase.createClient('https://ltaghuumilyjdzpmatqj.supabase.co','sb_publishable_KXmx7LEqpZ3g5u-iRMeyDA__bWJBbqH');cargarExps();}; document.head.appendChild(s); }
 loadSupabase();
-async function cargarExps(){
- var cont=document.getElementById('listaExp'); var resumen=document.getElementById('resumenExp');
- if(!supabaseClient){cont.innerHTML='Conectando...';return}
- var r=await supabaseClient.from('experiencias').select('*').order('id',{ascending:false}).limit(80);
- if(r.error){cont.innerHTML='Error: '+r.error.message;resumen.innerHTML='Error';return}
- todasExps=r.data||[];
- if(todasExps.length==0){ cont.innerHTML='<p class=small>Sin experiencias.</p>'; resumen.innerHTML='<b>Comunidad</b><br><span class=small>Sin experiencias.</span>'; return; }
- var ok=todasExps.filter(x=>x.tipo==='ok').length; var dud=todasExps.filter(x=>x.tipo==='dudosa').length; var mal=todasExps.filter(x=>x.tipo==='mala').length;
- resumen.innerHTML='<b>👥 Resumen comunidad</b><div class="state-row" style="margin-top:6px"><span class="state">🟢 Bien: '+ok+'</span><span class="state">🟡 Dudosa: '+dud+'</span><span class="state">🔴 Problemas: '+mal+'</span><span class="state">Total: '+todasExps.length+'</span></div>';
- var html=''; for(var i=0;i<todasExps.length;i++){ var d=todasExps[i]; var img=''; if(d.foto){img='<img src="'+d.foto+'" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-top:8px">';} var tipoIcon=d.tipo==='ok'?'🟢':d.tipo==='mala'?'🔴':'🟡'; var esMio=misReportes.indexOf(d.id)!==-1; var btnDel=esMio?'<button class=del onclick="borrarExp('+d.id+')">🗑️ Borrar</button>':''; html+='<div class=exp-card><b>'+tipoIcon+' '+escapeHtml(d.tienda)+'</b> <span class=small>• '+(escapeHtml(d.nombre)||'Anónimo')+'</span><div style="margin-top:6px;font-size:13px">'+escapeHtml(d.texto)+'</div>'+img+'<br>'+btnDel+'</div>'; } cont.innerHTML=html;
-}
+async function cargarExps(){ var cont=document.getElementById('listaExp'); var resumen=document.getElementById('resumenExp'); if(!supabaseClient){cont.innerHTML='Conectando...';return} var r=await supabaseClient.from('experiencias').select('*').order('id',{ascending:false}).limit(80); if(r.error){cont.innerHTML='Error: '+r.error.message;return} todasExps=r.data||[]; if(todasExps.length==0){ cont.innerHTML='<p class=small>Sin experiencias.</p>'; resumen.innerHTML='<b>Comunidad</b><br><span class=small>Sin experiencias.</span>'; return; } var ok=todasExps.filter(x=>x.tipo==='ok').length; var dud=todasExps.filter(x=>x.tipo==='dudosa').length; var mal=todasExps.filter(x=>x.tipo==='mala').length; resumen.innerHTML='<b>👥 Resumen comunidad</b><div class="state-row"><span class="state">🟢 Bien: '+ok+'</span><span class="state">🟡 Dudosa: '+dud+'</span><span class="state">🔴 Probl: '+mal+'</span></div>'; var html=''; for(var i=0;i<todasExps.length;i++){ var d=todasExps[i]; var img=''; if(d.foto){img='<img src="'+d.foto+'" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-top:8px">';} var tipoIcon=d.tipo==='ok'?'🟢':d.tipo==='mala'?'🔴':'🟡'; var esMio=misReportes.indexOf(d.id)!==-1; var btnDel=esMio?'<button class=del onclick="borrarExp('+d.id+')">🗑️ Borrar</button>':''; html+='<div class=exp-card><b>'+tipoIcon+' '+escapeHtml(d.tienda)+'</b><div style="margin-top:6px;font-size:13px">'+escapeHtml(d.texto)+'</div>'+img+'<br>'+btnDel+'</div>'; } cont.innerHTML=html; }
 function escapeHtml(s){ if(!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function renderExpSummaryForDomain(domainRaw){
- var cont=document.getElementById('resExpSum'); if(!cont) return;
- if(!domainRaw || todasExps.length===0){ cont.innerHTML='Sin experiencias para este dominio.'; return; }
- var norm=domainRaw.toLowerCase().replace(/https?:\/\//,'').replace(/^www\./,'').split('/')[0].replace(/^@/,'');
- var filtered=todasExps.filter(x=>{ var t=(x.tienda||'').toLowerCase(); return t.includes(norm) || norm.includes(t.replace(/@/g,'')); });
- if(filtered.length===0){ cont.innerHTML='Sin experiencias para <b>'+escapeHtml(domainRaw)+'</b>.'; return; }
- var ok=filtered.filter(x=>x.tipo==='ok').length; var dud=filtered.filter(x=>x.tipo==='dudosa').length; var mal=filtered.filter(x=>x.tipo==='mala').length;
- cont.innerHTML='<div class="state-row"><span class="state">🟢 Bien: '+ok+'</span><span class="state">🟡 Dudosa: '+dud+'</span><span class="state">🔴 Probl: '+mal+'</span></div><p style="margin-top:6px">'+filtered.length+' reportes.</p>';
-}
-async function borrarExp(id){ if(!confirm('¿Borrar?')) return; var r=await supabaseClient.from('experiencias').delete().eq('id',id); if(r.error){alert('Error: '+r.error.message);return} misReportes=misReportes.filter(function(x){return x!==id;}); localStorage.setItem('misReportes',JSON.stringify(misReportes)); cargarExps(); }
+function renderExpSummaryForDomain(domainRaw){ var cont=document.getElementById('resExpSum'); if(!cont) return; if(!domainRaw || todasExps.length===0){ cont.innerHTML='Sin experiencias para este dominio.'; return; } var norm=domainRaw.toLowerCase().replace(/https?:\/\//,'').replace(/^www\./,'').split('/')[0].replace(/^@/,''); var filtered=todasExps.filter(x=>{ var t=(x.tienda||'').toLowerCase(); return t.includes(norm) || norm.includes(t.replace(/@/g,'')); }); if(filtered.length===0){ cont.innerHTML='Sin experiencias para <b>'+escapeHtml(domainRaw)+'</b>.'; return; } var ok=filtered.filter(x=>x.tipo==='ok').length; var mal=filtered.filter(x=>x.tipo==='mala').length; cont.innerHTML=filtered.length+' reportes.'; }
+async function borrarExp(id){ if(!confirm('¿Borrar?')) return; var r=await supabaseClient.from('experiencias').delete().eq('id',id); if(r.error){alert('Error');return} misReportes=misReportes.filter(x=>x!==id); localStorage.setItem('misReportes',JSON.stringify(misReportes)); cargarExps(); }
 window.borrarExp=borrarExp;
 document.getElementById('btnPub').onclick=async function(){
  if(!supabaseClient){alert('Esperá 2 seg...');return}
  var tienda=document.getElementById('expTienda').value.trim(); var texto=document.getElementById('expTexto').value.trim(); var nombre=document.getElementById('expNombre').value.trim()||'Anónimo'; var tipo=document.getElementById('expTipo').value;
- if(!tienda||!texto){alert('Completa tienda y qué pasó');return}
+ if(!tienda||!texto){alert('Completa tienda');return}
  var btn=this;btn.innerHTML='Publicando...';btn.disabled=true;
  var file=document.getElementById('expFoto').files[0];var foto=null;
  if(file){foto=await new Promise(function(res){var r=new FileReader();r.onload=function(e){res(e.target.result);};r.readAsDataURL(file);});}
  var payload={nombre:nombre,tienda:tienda,texto:texto,foto:foto,tipo:tipo};
  var result=await supabaseClient.from('experiencias').insert([payload]).select();
- if(result.error){ var payload2={nombre:nombre,tienda:tienda,texto:texto,foto:foto}; result=await supabaseClient.from('experiencias').insert([payload2]).select(); if(result.error){ var payload3={nombre:nombre,tienda:tienda,texto:texto}; result=await supabaseClient.from('experiencias').insert([payload3]).select(); } }
- if(result.error){alert(result.error.message);} else { var nuevoId=result.data&&result.data[0]&&result.data[0].id; if(nuevoId){misReportes.push(nuevoId);localStorage.setItem('misReportes',JSON.stringify(misReportes));} document.getElementById('expTienda').value='';document.getElementById('expTexto').value='';document.getElementById('expFoto').value=''; cargarExps(); }
+ if(result.error){ alert(result.error.message); } else { var nuevoId=result.data&&result.data[0]&&result.data[0].id; if(nuevoId){misReportes.push(nuevoId);localStorage.setItem('misReportes',JSON.stringify(misReportes));} document.getElementById('expTienda').value='';document.getElementById('expTexto').value=''; cargarExps(); }
  btn.innerHTML='Publicar experiencia';btn.disabled=false;
 };
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
 </script>
 </body>
 </html>
