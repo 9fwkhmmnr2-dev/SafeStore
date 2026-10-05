@@ -1,262 +1,393 @@
 <!DOCTYPE html>
 <html lang="es">
-<head><script>(function(s){s.dataset.zone='11795121',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SafeStore - Verificá antes de pagar</title>
+<title>Store Verifier - Verificá una tienda antes de pagar</title>
+<meta name="description" content="Pegá el link de una tienda online y mirá su puntaje de fiabilidad según señales comprobables.">
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0F2C61">
+<meta name="theme-color" content="#0F1B3D">
 <link rel="apple-touch-icon" href="/icon-192.png">
-<link rel="icon" href="/icon-192.png">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="icon" type="image/png" href="/icon-192.png">
 <style>
-:root{--blue:#0F2C61;--blue2:#1E4BD8;--light:#F1F5F9}
+:root{--ink:#0F1B3D;--blue:#2D5BFF;--paper:#F3F5FB;--gold:#FFC83D;--line:#D9E0EC;--mute:#5B6780;--ok:#15803D;--mid:#B45309;--bad:#B91C1C}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;background:var(--light);color:#1E293B;line-height:1.4}
-.top{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;padding:30px 20px 48px;text-align:center}
-.top h1{font-size:30px;font-weight:900;letter-spacing:-.5px;display:flex;align-items:center;justify-content:center;gap:10px}
-.top h1 img{width:40px;height:40px;border-radius:10px}
-.top p.sub{margin-top:6px;font-size:15px;opacity:.9}
-.top p.claim{margin-top:14px;display:inline-block;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600}
-.wrap{max-width:760px;margin:-24px auto 0;padding:0 12px 50px}
-.card{background:#fff;border-radius:20px;padding:18px;border:1px solid #DBEAFE;margin-bottom:16px;box-shadow:0 8px 24px rgba(15,44,97,.06)}
-.hero-title{font-size:18px;font-weight:800}
-.hero-desc{font-size:13px;color:#64748B;margin-top:4px}
-.tab{display:flex;gap:8px;margin:16px 0}
-.tab button{flex:1;padding:12px;border-radius:12px;border:1.5px solid #BFDBFE;background:#EFF6FF;font-weight:700;cursor:pointer}
-.tab button.active{background:var(--blue);color:#fff;border-color:var(--blue)}
-.input{width:100%;padding:15px 14px;border-radius:14px;border:2px solid #BFDBFE;font-size:15px;outline:none}
-.input:focus{border-color:var(--blue2)}
-.section-label{font-size:12px;font-weight:800;color:#334155;letter-spacing:.5px;text-transform:uppercase;margin:18px 0 8px;display:flex;justify-content:space-between}
-.grid{display:grid;gap:8px}
-.check{display:flex;gap:10px;padding:11px 12px;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:12px;font-size:13px;cursor:pointer}
-.check:has(input:checked){border-color:#93C5FD;background:#EFF6FF}
-.check.risk:has(input:checked){border-color:#FCA5A5;background:#FEF2F2}
-.check.pos:has(input:checked){border-color:#86EFAC;background:#F0FDF4}
-.why-btn{margin-left:auto;background:#fff;border:1px solid #E2E8F0;border-radius:999px;padding:2px 8px;font-size:11px;cursor:pointer}
-.why-box{display:none;margin-top:8px;padding:8px 10px;background:#fff;border:1px dashed #CBD5E1;border-radius:8px;font-size:12px;color:#475569}
-.why-box.open{display:block}
-.btn{width:100%;margin-top:14px;padding:15px;border-radius:14px;background:var(--blue);color:#fff;font-weight:800;border:0;cursor:pointer;font-size:15px}
-.btn2{background:#fff;color:var(--blue);border:2px solid var(--blue)}
-.res{margin-top:16px;border-radius:18px;padding:0;overflow:hidden;display:none;border:2px solid #E2E8F0}
-.res-head{padding:16px}
-.res-body{padding:14px;background:#fff}
-.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.kpi{padding:10px;border-radius:12px;border:1px solid #E2E8F0;background:#F8FAFC}
-.kpi b{font-size:18px;display:block}
-.state-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.state{font-size:11px;padding:5px 8px;border-radius:999px;border:1px solid #E2E8F0;background:#fff}
-.domain-card{margin-top:10px;display:grid;gap:6px}
-.domain-item{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid #E2E8F0;border-radius:10px;font-size:12px;background:#F8FAFC}
-.action-list{margin-top:8px;display:grid;gap:6px}
-.action-list li{list-style:none;padding:8px 10px;background:#F1F5F9;border-radius:10px;font-size:12px;border:1px solid #E2E8F0}
-.small{font-size:11px;color:#64748B}
-.exp-card{padding:12px;border:1px solid #E2E8F0;border-radius:14px;background:#fff;margin-bottom:10px}
-.del{margin-top:8px;padding:6px 10px;border-radius:8px;border:1px solid #FECACA;background:#FEF2F2;color:#B91C1C;font-size:11px;cursor:pointer}
-.text{width:100%;padding:11px;border:1px solid #CBD5E1;border-radius:10px;margin-top:8px;font-size:13px}
-.hist-item{display:flex;justify-content:space-between;gap:8px;padding:10px;border:1px solid #E2E8F0;border-radius:10px;margin-bottom:6px;background:#fff;font-size:12px}
-.hidden{display:none}
-.loader{width:14px;height:14px;border:2px solid #CBD5E1;border-top-color:#1E4BD8;border-radius:50%;display:inline-block;animation:spin.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--paper);color:var(--ink);line-height:1.5}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+header{background:var(--ink);color:#fff;padding:28px 20px 64px}
+.hd{max-width:720px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px}
+.brand svg{flex:none}
+header h1{font-size:clamp(26px,6vw,38px);line-height:1.15;margin-top:22px;max-width:520px;font-weight:800}
+header p{margin-top:10px;color:#C5D1EA;font-size:15px;max-width:520px}
+main{max-width:720px;margin:-40px auto 0;padding:0 14px 40px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tabs button{flex:1;padding:11px;border:1px solid var(--line);background:#fff;border-radius:10px;font:inherit;font-weight:700;color:var(--mute);cursor:pointer}
+.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+label.lb{display:block;font-weight:700;font-size:14px;margin:14px 0 6px}
+.in{width:100%;padding:13px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-size:16px;background:#fff}
+.in:focus{border-color:var(--blue);outline:none}
+.hint{font-size:12.5px;color:var(--mute);margin-top:4px}
+h2{font-size:16px;margin:20px 0 8px}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;margin-bottom:6px;font-size:14px;cursor:pointer}
+.chk input{margin-top:3px;width:17px;height:17px}
+.chk.r:has(input:checked){border-color:#F1A7A7;background:#FEF3F3}
+.chk.p:has(input:checked){border-color:#8FD3A8;background:#F0FAF3}
+.btn{width:100%;margin-top:16px;padding:14px;border:0;border-radius:10px;background:var(--blue);color:#fff;font:inherit;font-weight:800;font-size:16px;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn.sec{background:#fff;color:var(--ink);border:1.5px solid var(--ink)}
+#res{display:none}
+.top{display:flex;gap:18px;align-items:center}
+.gauge{position:relative;width:132px;height:132px;flex:none}
+.gauge svg{transform:rotate(-90deg)}
+.gauge .n{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:36px;font-weight:800;line-height:1}
+.gauge .n small{font-size:12px;font-weight:600;color:var(--mute);margin-top:4px}
+.lvl{font-size:20px;font-weight:800}
+.dom{font-size:13px;color:var(--mute);word-break:break-all;margin-top:2px}
+.row{margin-top:12px}
+.row .h{display:flex;justify-content:space-between;font-size:13.5px;font-weight:700}
+.bar{height:8px;background:#E8EDF5;border-radius:99px;margin-top:5px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px}
+.row .d{font-size:12.5px;color:var(--mute);margin-top:3px}
+ul.todo{margin:8px 0 0 18px;font-size:14px}
+.note{font-size:12.5px;color:var(--mute);margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.exp{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:10px;font-size:14px}
+.exp img{width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-top:8px}
+.exp .m{font-size:12px;color:var(--mute);margin-top:8px;display:flex;gap:12px}
+.exp a,.exp button{font:inherit;font-size:12px;color:var(--mute);background:none;border:0;text-decoration:underline;cursor:pointer}
+.hi{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.hidden{display:none!important}
+footer{max-width:720px;margin:0 auto;padding:0 14px 40px;font-size:12.5px;color:var(--mute)}
+@media(max-width:480px){.top{flex-direction:column;text-align:center}}
+@media(prefers-reduced-motion:no-preference){.bar i{transition:width .6s}}
+
+header{background-image:radial-gradient(rgba(255,255,255,.08) 1px,transparent 1px);background-size:18px 18px}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.pills span{border:1px solid rgba(255,255,255,.28);border-radius:99px;padding:4px 12px;font-size:12.5px;color:#DCE6FA}
+.card{box-shadow:0 1px 2px rgba(11,31,68,.05),0 14px 30px -14px rgba(11,31,68,.22)}
+.btn,.tabs button,.chk,.chips button{transition:transform .15s,box-shadow .15s,border-color .15s,background .15s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 20px -6px rgba(45,91,255,.45)}
+.btn.sec:hover{box-shadow:0 10px 20px -8px rgba(11,31,68,.35);background:#F4F7FF}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.tabs button:hover:not(.on){border-color:var(--blue);color:var(--ink)}
+.chk:hover{border-color:#9DB4E8;transform:translateX(2px)}
+.chk input{accent-color:var(--blue)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.chips button{border:1px solid var(--line);background:#F4F7FF;color:var(--blue);border-radius:99px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}
+.chips button:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.steps{list-style:none;margin-top:10px}
+.steps li{display:flex;gap:10px;align-items:center;padding:7px 0;font-size:14px;color:var(--mute)}
+.steps i{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--blue);animation:sp .8s linear infinite;flex:none}
+.steps li.done{color:var(--ink)}
+.steps li.done i{animation:none;border:0;background:var(--ok);position:relative}
+.steps li.done i::after{content:"✓";color:#fff;font-size:11px;position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.steps i{animation:none}.btn:hover,.chk:hover{transform:none}}
+#share{margin-top:14px}
 </style>
 </head>
 <body>
-<div class="top">
-<h1><img src="/icon-192.png"> SafeStore</h1>
-<p class="sub">Antes de comprar, verificá.</p>
-<p class="sub" style="font-size:13px;margin-top:2px">Ahora con AutoScan de dominio y CUIT + App instalable.</p>
-<p class="claim">No afirmamos estafas sin evidencia. Mostramos señales comprobables.</p>
+<header><div class="hd">
+<div class="brand"><svg width="36" height="36" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#2D5BFF"/><path d="M23 27v-4a6 6 0 0 1 12 0v4" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/><rect x="14" y="26" width="30" height="27" rx="4.5" fill="#0F1B3D"/><circle cx="42" cy="40" r="13.5" fill="#2D5BFF"/><circle cx="42" cy="40" r="10" fill="#2D5BFF" stroke="#FFC83D" stroke-width="4"/><path d="M50 48l7 7" stroke="#FFC83D" stroke-width="5.2" stroke-linecap="round"/><path d="M37.5 40.5l3 3 5.5-6.5" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Store Verifier</div>
+<h1>Mirá qué dicen las señales antes de pagar.</h1>
+<p>Pegá el link de una tienda y te mostramos un puntaje de fiabilidad con el detalle de cómo lo calculamos.</p>
+<div class="pills"><span>Datos de registros públicos</span><span>Sin anuncios</span><span>Opiniones de la comunidad</span></div>
+</div></header>
+
+<main>
+<div class="tabs" role="tablist">
+<button id="tabA" class="on" role="tab">Analizar tienda</button>
+<button id="tabB" role="tab">Comunidad</button>
 </div>
-<div class="wrap">
+
+<section id="secA">
 <div class="card">
-<div class="tab"><button id="btnTabWeb" class="active">🌐 Analizar enlace</button><button id="btnTabExp">📸 Comunidad</button></div>
-<div id="seccionWeb">
-<div class="hero-title">Verificá antes de pagar</div>
-<div class="hero-desc">Pegá el link. SafeStore verifica antigüedad del dominio y CUIT automáticamente.</div>
-<input id="url" class="input" placeholder="Pega link ej: tienda.com o @tienda" style="margin-top:14px">
-<input id="cuitManual" class="input" placeholder="¿Muestra CUIT? Pegalo acá ej: 20-12345678-6 (opcional)" style="margin-top:8px;border-style:dashed">
-<div class="section-label"><span>⚠️ Señales de riesgo</span><span class="small">Auto + manual</span></div>
-<div class="grid">
-<label class="check risk"><input type="checkbox" id="c1"><span><b>Solo acepta transferencia / cripto</b></span><button class="why-btn" data-w="w1">ⓘ</button><div class="why-box" id="w1">Evitan métodos con protección.</div></label>
-<label class="check risk"><input type="checkbox" id="c2"><span><b>No muestra CUIT ni domicilio</b></span><button class="why-btn" data-w="w2">ⓘ</button><div class="why-box" id="w2">Comercio real suele mostrar CUIT.</div></label>
-<label class="check risk"><input type="checkbox" id="c3"><span><b>Precios 60% más baratos y apura a pagar</b></span><button class="why-btn" data-w="w3">ⓘ</button><div class="why-box" id="w3">Descuentos irreales + urgencia.</div></label>
-<label class="check risk"><input type="checkbox" id="c4"><span><b>Sin política de cambios</b></span></label>
-<label class="check risk"><input type="checkbox" id="c5"><span><b>Fotos robadas o solo WhatsApp</b></span></label>
+<label class="lb" for="url" style="margin-top:0">Link de la tienda</label>
+<input id="url" class="in" placeholder="tienda.com.ar o @tienda" autocomplete="off" inputmode="url">
+<div class="chips" id="ej"><span class="hint">Probá con:</span><button type="button" data-u="mercadolibre.com.ar">mercadolibre.com.ar</button><button type="button" data-u="tiendanube.com">tiendanube.com</button></div>
+<label class="lb" for="cuit">CUIT que muestra la tienda (opcional)</label>
+<input id="cuit" class="in" placeholder="20-12345678-6" inputmode="numeric">
+<p class="hint">Si la tienda no muestra CUIT, dejalo vacío: también es una señal.</p>
+
+<h2>Lo que no podemos detectar solos</h2>
+<p class="hint" style="margin:-4px 0 8px">Marcá lo que corresponda. Pesa menos que los chequeos automáticos.</p>
+<label class="chk r"><input type="checkbox" id="c1"><span>Solo acepta transferencia bancaria (sin tarjeta ni Mercado Pago)</span></label>
+<label class="chk r"><input type="checkbox" id="c2"><span>No muestra CUIT ni domicilio</span></label>
+<label class="chk r"><input type="checkbox" id="c3"><span>Precios muy por debajo del mercado y te apura a pagar</span></label>
+<label class="chk r"><input type="checkbox" id="c4"><span>No tiene política de cambios o devoluciones</span></label>
+<label class="chk r"><input type="checkbox" id="c5"><span>Fotos robadas o atiende solo por WhatsApp</span></label>
+<label class="chk p"><input type="checkbox" id="c6"><span>Muestra CUIT y domicilio verificables</span></label>
+<label class="chk p"><input type="checkbox" id="c7"><span>Ofrece medios de pago con protección (tarjeta, Mercado Pago)</span></label>
+<label class="chk p"><input type="checkbox" id="c8"><span>Redes activas desde hace tiempo</span></label>
+
+<button class="btn" id="go">Calcular puntaje</button>
 </div>
-<div class="section-label"><span>✅ Señales positivas</span></div>
-<div class="grid">
-<label class="check pos"><input type="checkbox" id="c6"><span><b>Muestra CUIT verificable</b></span></label>
-<label class="check pos"><input type="checkbox" id="c7"><span><b>Medios de pago con protección</b></span></label>
-<label class="check pos"><input type="checkbox" id="c8"><span><b>Redes activas y antigüedad visible</b></span></label>
+
+<div id="scan" class="card hidden" aria-live="polite"><b>Revisando señales...</b><ul class="steps" id="steps"></ul></div>
+<div id="res" class="card" aria-live="polite">
+<div class="top">
+<div class="gauge"><svg width="132" height="132" viewBox="0 0 132 132"><circle cx="66" cy="66" r="56" fill="none" stroke="#E8EDF5" stroke-width="12"/><circle id="arc" cx="66" cy="66" r="56" fill="none" stroke="#999" stroke-width="12" stroke-linecap="round" stroke-dasharray="352" stroke-dashoffset="352"/></svg><div class="n"><span id="num">0</span><small>de 100</small></div></div>
+<div><div class="lvl" id="lvl"></div><div class="dom" id="dom"></div><div class="hint" id="when"></div></div>
 </div>
-<button class="btn" id="btnEvaluar">🔍 Analizar con AutoScan</button>
-<button class="btn btn2" id="btnBorrar" style="display:none;margin-top:8px">🗑️ Borrar</button>
-<div id="res" class="res"><div class="res-head" id="resHead"><h2 id="tit" style="font-size:18px"></h2><p id="score" class="small" style="margin-top:4px"></p><div class="state-row" id="stateRow"></div></div><div class="res-body"><div class="kpis"><div class="kpi"><span class="small">Riesgo</span><b id="kpiRisk">0</b></div><div class="kpi"><span class="small">Positivas</span><b id="kpiPos">0</b></div></div><div style="margin-top:14px"><b style="font-size:13px">🔎 Análisis automático</b><div class="domain-card" id="domainCard"></div></div><div style="margin-top:14px"><b style="font-size:13px">📋 Detalle</b><div id="ev" style="margin-top:8px;display:grid;gap:6px"></div></div><div style="margin-top:14px"><b style="font-size:13px">👥 Comunidad</b><div id="resExpSum" class="small">Analizando...</div></div><div style="margin-top:14px"><b style="font-size:13px">👉 Qué hacer</b><ul id="todoList" class="action-list"></ul></div></div></div>
-<div id="historialBox" style="margin-top:18px"><div class="section-label"><span>🕓 Historial local</span><button class="why-btn" id="btnClearHist">Borrar</button></div><div id="histList" class="small">Sin análisis previos</div></div>
+<div id="rows"></div>
+<h2>Qué te recomendamos</h2>
+<ul class="todo" id="todo"></ul>
+<button class="btn sec" id="share" type="button">Compartir por WhatsApp</button>
+<p class="note">Este puntaje es orientativo y se basa en señales observables. No es un veredicto: ninguna herramienta garantiza que una tienda sea segura. Ante la duda, pagá con tarjeta o Mercado Pago y guardá los comprobantes.</p>
 </div>
-<div id="seccionExp" class="hidden">
-<h3 style="font-size:16px">📸 Experiencias</h3>
-<select id="expTipo" class="text"><option value="ok">🟢 Compré y salió bien</option><option value="dudosa">🟡 Dudosa</option><option value="mala">🔴 Tuve problemas</option></select>
-<input id="expNombre" class="text" placeholder="Tu nombre (opcional)">
-<input id="expTienda" class="text" placeholder="Tienda o @usuario">
-<textarea id="expTexto" class="text" rows="3" placeholder="Qué pasó?"></textarea>
-<input type="file" id="expFoto" accept="image/*" style="margin-top:8px;font-size:12px">
-<button class="btn btn2" id="btnPub">Publicar experiencia</button>
-<div id="resumenExp" class="card" style="margin-top:14px;padding:12px;background:#F8FAFC"></div>
-<div id="listaExp" style="margin-top:14px">Cargando...</div>
+
+<div class="card"><b>Historial en este dispositivo</b><div id="hist" class="hint" style="margin-top:6px">Sin análisis previos.</div>
+<button class="btn sec" id="clrH" style="margin-top:10px;padding:9px;font-size:14px">Borrar historial</button></div>
+</section>
+
+<section id="secB" class="hidden">
+<div class="card">
+<h2 style="margin-top:0">Contá tu experiencia</h2>
+<label class="lb" for="eT">Qué pasó</label>
+<select id="eT" class="in"><option value="ok">Compré y salió bien</option><option value="dudosa">Me dejó dudas</option><option value="mala">Tuve problemas</option></select>
+<label class="lb" for="eS">Tienda o @usuario</label>
+<input id="eS" class="in" maxlength="80" placeholder="tienda.com.ar">
+<label class="lb" for="eN">Tu nombre (opcional)</label>
+<input id="eN" class="in" maxlength="40">
+<label class="lb" for="eX">Detalle</label>
+<textarea id="eX" class="in" rows="4" maxlength="600" placeholder="Contá hechos concretos: qué compraste, cuándo, qué pasó."></textarea>
+<label class="lb" for="eF">Foto (opcional)</label>
+<input type="file" id="eF" accept="image/jpeg,image/png,image/webp">
+<p class="hint">Publicá solo hechos que viviste. Las opiniones son de los usuarios y no representan a Store Verifier.</p>
+<button class="btn" id="pub">Publicar experiencia</button>
 </div>
-</div>
-</div>
+<div class="card"><div id="sum"></div><div id="list">Cargando...</div></div>
+</section>
+</main>
+
+<footer>
+<p><b>Store Verifier</b> muestra señales comprobables, no afirma que una tienda sea una estafa. Si sos dueño de una tienda y querés corregir o apelar información, escribinos a <a href="mailto:esberreta@gmail.com">esberreta@gmail.com</a>.</p>
+</footer>
+
 <script>
-document.getElementById('btnTabWeb').onclick=function(){document.getElementById('btnTabWeb').className='active';document.getElementById('btnTabExp').className='';document.getElementById('seccionWeb').className='';document.getElementById('seccionExp').className='hidden';};
-document.getElementById('btnTabExp').onclick=function(){document.getElementById('btnTabExp').className='active';document.getElementById('btnTabWeb').className='';document.getElementById('seccionExp').className='';document.getElementById('seccionWeb').className='hidden';};
-document.addEventListener('click',function(e){ if(e.target.classList.contains('why-btn') && e.target.dataset.w){ var box=document.getElementById(e.target.dataset.w); if(box) box.classList.toggle('open'); }});
-function limpiarCUIT(c){ return (c||'').replace(/[^0-9]/g,''); }
-function validarCUIT(cuit){
-  let c=limpiarCUIT(cuit); if(c.length!=11) return {ok:false, msg:'Debe tener 11 dígitos'};
-  let mult=[5,4,3,2,7,6,5,4,3,2]; let suma=0;
-  for(let i=0;i<10;i++) suma+=parseInt(c[i])*mult[i];
-  let ver=11-(suma%11); if(ver==11) ver=0; if(ver==10) ver=9;
-  if(ver==parseInt(c[10])) return {ok:true, msg:'CUIT válido (dígito verificador correcto)',cuit:c};
-  return {ok:false, msg:'CUIT inválido (dígito no coincide)'};
+var BACKEND_URL=''; // Etapa 2: acá va la URL de tu backend de antigüedad .com.ar (ver nota)
+var SB_URL='https://ltaghuumilyjdzpmatqj.supabase.co', SB_KEY='sb_publishable_KXmx7LEqpZ3g5u-iRMeyDA__bWJBbqH';
+var $=function(i){return document.getElementById(i)};
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+
+/* Pestañas */
+function tab(a){$('secA').classList.toggle('hidden',!a);$('secB').classList.toggle('hidden',a);$('tabA').className=a?'on':'';$('tabB').className=a?'':'on'}
+$('tabA').onclick=function(){tab(true)};$('tabB').onclick=function(){tab(false)};
+
+/* CUIT */
+function validarCUIT(raw){
+  var c=(raw||'').replace(/\D/g,'');
+  if(c.length!==11)return{ok:false,msg:'Debe tener 11 dígitos'};
+  var m=[5,4,3,2,7,6,5,4,3,2],s=0;
+  for(var i=0;i<10;i++)s+=parseInt(c[i],10)*m[i];
+  var v=11-(s%11);if(v===11)v=0;if(v===10)v=9;
+  var pref=['20','23','24','27','30','33','34'].indexOf(c.slice(0,2))!==-1;
+  if(v!==parseInt(c[10],10))return{ok:false,msg:'El dígito verificador no coincide'};
+  if(!pref)return{ok:false,msg:'Prefijo poco habitual para un CUIT'};
+  return{ok:true,msg:'Formato válido. Confirmalo en ARCA (constancia de inscripción).'};
 }
-async function fetchDomainAge(domain){
-  if(!domain || domain.includes('@') || domain.length<3) return {status:'no_aplica', msg:'Usuario social'};
-  try{
-    const res= await fetch('https://rdap.org/domain/'+domain, {headers:{'Accept':'application/json'}});
-    if(!res.ok) throw new Error('rdap no ok');
-    const data= await res.json();
-    let ev=data.events||[];
-    let reg=ev.find(e=>e.eventAction==='registration');
-    if(!reg) return {status:'desconocido', msg:'Sin fecha'};
-    let fecha=new Date(reg.eventDate);
-    let dias=Math.floor((Date.now()-fecha)/86400000);
-    return {status:'ok', fecha:fecha, dias:dias};
-  }catch(e){ return {status:'error', msg:'No se pudo consultar (requiere backend para evitar CORS)'}; }
-}
+
+/* Dominio */
 function parseDomain(raw){
- if(!raw) return null;
- let v=raw.trim(); if(v.startsWith('@')) return {raw:v,type:'social',domain:v,https:'❓ No aplica'};
- try{
-   if(!v.match(/^https?:\/\//)) v='https://'+v.replace(/^\/\//,'');
-   const u=new URL(v); const hostname=u.hostname.toLowerCase().replace(/^www\./,'');
-   const https=u.protocol==='https:'? '✅ Sí - HTTPS': '⚠️ No - HTTP';
-   let sospechas=[]; if(/^\d+\.\d+\.\d+\.\d+$/.test(hostname)) sospechas.push('IP directa');
-   return {raw:raw,type:'web',domain:hostname,https:https, sospechas:sospechas};
- }catch(e){ return {raw:raw,type:'unknown',domain:raw,https:'❓'}; }
+  var v=(raw||'').trim();if(!v)return null;
+  if(v.charAt(0)==='@')return{type:'social',domain:v.slice(0,60),https:null};
+  try{
+    if(!/^https?:\/\//i.test(v))v='https://'+v.replace(/^\/\//,'');
+    var u=new URL(v),h=u.hostname.toLowerCase().replace(/^www\./,'');
+    if(h.indexOf('.')<1)return null;
+    return{type:'web',domain:h,https:u.protocol==='https:',ip:/^\d+\.\d+\.\d+\.\d+$/.test(h),typed:/^https?:\/\//i.test(raw.trim())};
+  }catch(e){return null}
 }
-let scanTimeout=null;
-document.getElementById('url').oninput=function(){
- document.getElementById('btnBorrar').style.display=this.value.length>0?'block':'none';
- clearTimeout(scanTimeout);
- if(this.value.length>4){ scanTimeout=setTimeout(()=>{ document.getElementById('btnEvaluar').click(); }, 800); }
-};
-document.getElementById('btnBorrar').onclick=function(){
- document.getElementById('url').value=''; document.getElementById('cuitManual').value='';
- document.getElementById('res').style.display='none'; this.style.display='none';
- document.querySelectorAll('#seccionWeb input[type=checkbox]').forEach(c=>c.checked=false);
-};
-async function renderDomainCard(info, ageInfo, cuitInfo){
- const card=document.getElementById('domainCard');
- if(!info){ card.innerHTML='<div class="domain-item"><span>Dominio</span><b>❓</b></div>'; return; }
- let html=''; html+='<div class="domain-item"><span>Dominio</span><b>'+info.domain+'</b></div>';
- html+='<div class="domain-item"><span>HTTPS</span><b>'+info.https+'</b></div>';
- if(ageInfo){
-   if(ageInfo.status==='ok'){
-     let color=ageInfo.dias<30?'#FEF2F2':ageInfo.dias<90?'#FFFBEB':'#F0FDF4';
-     let border=ageInfo.dias<30?'#FCA5A5':ageInfo.dias<90?'#FDE68A':'#86EFAC';
-     let icono=ageInfo.dias<30?'🔴':ageInfo.dias<90?'🟡':'🟢';
-     html+='<div class="domain-item" style="background:'+color+';border-color:'+border+'"><span>'+icono+' Antigüedad</span><b>'+ageInfo.dias+' días ('+ageInfo.fecha.toLocaleDateString('es-AR')+')</b></div>';
-   } else { html+='<div class="domain-item"><span>Antigüedad</span><b>'+ageInfo.msg+'</b></div>'; }
- } else { html+='<div class="domain-item"><span>Antigüedad</span><b><span class="loader"></span> Consultando...</b></div>'; }
- if(cuitInfo){
-   let color=cuitInfo.ok?'#F0FDF4':'#FEF2F2'; let border=cuitInfo.ok?'#86EFAC':'#FCA5A5';
-   html+='<div class="domain-item" style="background:'+color+';border-color:'+border+'"><span>'+(cuitInfo.ok?'✅':'❌')+' CUIT</span><b>'+cuitInfo.msg+'</b></div>';
- } else { html+='<div class="domain-item"><span>CUIT</span><b>ℹ️ No ingresado</b></div>'; }
- card.innerHTML=html;
+async function domainAge(d){
+  var ctl=new AbortController(),t=setTimeout(function(){ctl.abort()},8000);
+  try{
+    var url=BACKEND_URL?BACKEND_URL+'?domain='+encodeURIComponent(d):(/\.ar$/.test(d)?'https://rdap.nic.ar/domain/':'https://rdap.org/domain/')+encodeURIComponent(d);
+    var r=await fetch(url,{headers:{Accept:'application/json'},signal:ctl.signal});
+    if(!r.ok)throw 0;
+    var j=await r.json(),f;
+    if(BACKEND_URL&&j.fecha)f=new Date(j.fecha);
+    else{var e=(j.events||[]).find(function(x){return x.eventAction==='registration'});if(!e)throw 0;f=new Date(e.eventDate)}
+    if(isNaN(f))throw 0;
+    return{ok:true,fecha:f,dias:Math.floor((Date.now()-f)/864e5)};
+  }catch(e){return{ok:false}}finally{clearTimeout(t)}
 }
-document.getElementById('btnEvaluar').onclick=async function(){
- var riskIds=['c1','c2','c3','c4','c5']; var posIds=['c6','c7','c8'];
- var riskCount=0,posCount=0;
- riskIds.forEach(id=>{ if(document.getElementById(id).checked) riskCount++; });
- posIds.forEach(id=>{ if(document.getElementById(id).checked) posCount++; });
- var rawUrl=document.getElementById('url').value.trim();
- var cuitRaw=document.getElementById('cuitManual').value.trim();
- var domainInfo=parseDomain(rawUrl);
- var cuitInfo=cuitRaw? validarCUIT(cuitRaw): null;
- var ageInfo=null;
- document.getElementById('res').style.display='block';
- document.getElementById('resHead').style.background='#F8FAFC';
- document.getElementById('tit').innerHTML='⏳ Analizando...';
- await renderDomainCard(domainInfo, null, cuitInfo);
- if(domainInfo && domainInfo.type==='web'){
-   ageInfo=await fetchDomainAge(domainInfo.domain);
-   if(ageInfo.status==='ok' && ageInfo.dias<90) riskCount++;
-   if(cuitInfo &&!cuitInfo.ok){ document.getElementById('c2').checked=true; riskCount++; }
-   if(cuitInfo && cuitInfo.ok){ document.getElementById('c6').checked=true; posCount++; }
- }
- await renderDomainCard(domainInfo, ageInfo, cuitInfo);
- var head=document.getElementById('resHead');
- let scoreAuto=0;
- if(ageInfo && ageInfo.status==='ok'){ if(ageInfo.dias<15) scoreAuto+=40; else if(ageInfo.dias<90) scoreAuto+=25; }
- if(cuitInfo &&!cuitInfo.ok) scoreAuto+=25;
- if(riskCount>0) scoreAuto+=riskCount*15;
- if(cuitInfo && cuitInfo.ok) scoreAuto-=20;
- if(posCount>0) scoreAuto-=posCount*10;
- scoreAuto=Math.max(0,Math.min(100,scoreAuto));
- var nivel='',colorBg='',icon='',todo=[],stateHtml='';
- if(scoreAuto>=50 || riskCount>=3){ nivel='🔴 Riesgo alto - '+scoreAuto+'/100'; colorBg='#FEF2F2'; icon='🔴'; todo=['No transfieras','Verificá CUIT en AFIP','Si tiene <90 días es muy sospechoso']; }
- else if(scoreAuto>=25 || riskCount>=1){ nivel='🟡 Riesgo moderado - '+scoreAuto+'/100'; colorBg='#FFFBEB'; icon='🟡'; todo=['Verificá redes','Pedí factura','Pagá con protección']; }
- else { nivel='🟢 Bajo riesgo - '+scoreAuto+'/100'; colorBg='#F0FDF4'; icon='🟢'; todo=['Igual verificá dominio','Guardá comprobantes']; }
- head.style.background=colorBg;
- document.getElementById('tit').innerHTML=nivel;
- document.getElementById('kpiRisk').innerHTML=riskCount+' ('+scoreAuto+')';
- document.getElementById('kpiPos').innerHTML=posCount;
- document.getElementById('score').innerHTML=(domainInfo? 'Dominio: <b>'+domainInfo.domain+'</b> • ':'')+new Date().toLocaleString('es-AR');
- document.getElementById('stateRow').innerHTML='<span class="state">'+nivel+'</span>';
- var ev=document.getElementById('ev'); let items=[];
- if(domainInfo) items.push('<div class="domain-item"><span>✅</span><span>Dominio: '+domainInfo.domain+'</span></div>');
- if(ageInfo && ageInfo.status==='ok') items.push('<div class="domain-item"><span>✅ Auto</span><span>'+ageInfo.dias+' días</span></div>');
- if(cuitInfo) items.push('<div class="domain-item"><span>'+(cuitInfo.ok?'✅':'❌')+'</span><span>'+cuitInfo.msg+'</span></div>');
- ev.innerHTML=items.join('');
- var ul=document.getElementById('todoList'); ul.innerHTML=''; todo.forEach(t=>{var li=document.createElement('li');li.textContent=t;ul.appendChild(li);});
- renderExpSummaryForDomain(domainInfo?domainInfo.domain:rawUrl);
- saveHist(domainInfo?domainInfo.domain:rawUrl||'sin-dominio', nivel, icon);
- renderHist();
+
+/* Historial en Wayback Machine: primera vez que archivaron el sitio */
+async function wayback(d){
+  var ctl=new AbortController(),t=setTimeout(function(){ctl.abort()},8000);
+  try{
+    var r=await fetch('https://archive.org/wayback/available?url='+encodeURIComponent(d)+'&timestamp=19900101',{signal:ctl.signal});
+    if(!r.ok)throw 0;
+    var j=await r.json(),c=j.archived_snapshots&&j.archived_snapshots.closest;
+    if(!c||!c.timestamp)return{ok:true,none:true};
+    var ts=c.timestamp,f=new Date(+ts.slice(0,4),+ts.slice(4,6)-1,+ts.slice(6,8));
+    return{ok:true,none:false,fecha:f,dias:Math.floor((Date.now()-f)/864e5)};
+  }catch(e){return{ok:false}}finally{clearTimeout(t)}
+}
+/* DNS por HTTPS (Cloudflare): ¿tiene mail propio (MX)? */
+async function dnsMX(d){
+  var ctl=new AbortController(),t=setTimeout(function(){ctl.abort()},6000);
+  try{
+    var r=await fetch('https://cloudflare-dns.com/dns-query?name='+encodeURIComponent(d)+'&type=MX',{headers:{Accept:'application/dns-json'},signal:ctl.signal});
+    if(!r.ok)throw 0;
+    var j=await r.json();
+    return{ok:true,mx:!!(j.Answer&&j.Answer.some(function(a){return a.type===15}))};
+  }catch(e){return{ok:false}}finally{clearTimeout(t)}
+}
+
+/* Puntaje de fiabilidad: más alto = más confiable. Suma máxima 100 */
+function puntuar(dom,age,cuit,risk,pos,com,ex){
+  var R=[],wb=ex.wb,mx=ex.mx;
+  // Dominio (35): usa el registro oficial; si no hay, el historial de Wayback como mínimo
+  var dias=null,ad='';
+  if(dom.type==='social'){R.push({n:'Antigüedad del dominio',v:12,m:35,d:'Es una cuenta de red social: no hay dominio para medir.'})}
+  else{
+    if(age&&age.ok){dias=age.dias;ad='Registrado hace '+age.dias+' días ('+age.fecha.toLocaleDateString('es-AR')+').'}
+    else if(wb&&wb.ok&&!wb.none){dias=wb.dias;ad='Sin dato oficial de registro. Pero el sitio ya existía hace al menos '+wb.dias+' días (primer archivo en Wayback Machine).'}
+    var a;
+    if(dias===null){a=12;ad=(wb&&wb.ok&&wb.none)?'No pudimos obtener la fecha de registro y el sitio no tiene historial público. Puntaje bajo-neutro.':'No pudimos consultar la antigüedad. Puntaje neutro.';if(wb&&wb.ok&&wb.none)a=8}
+    else a=dias<15?0:dias<90?9:dias<365?21:35;
+    if(age&&age.ok&&wb&&wb.ok&&!wb.none&&wb.dias>age.dias+30)ad+=' Ojo: el historial es anterior al registro actual (el dominio pudo cambiar de dueño).';
+    R.push({n:'Antigüedad del dominio',v:a,m:35,d:ad});
+  }
+  // Seguridad y contacto (15): HTTPS (10) + mail propio (5)
+  var s,sd;
+  if(dom.type==='social'){s=8;sd='No aplica a redes sociales.'}
+  else{
+    var h,hd;
+    if(dom.ip){h=0;hd='Usa una dirección IP en vez de un nombre.'}
+    else if(dom.typed&&!dom.https){h=0;hd='El link está en HTTP, sin cifrado.'}
+    else{h=10;hd=dom.typed?'Conexión HTTPS.':'Asumimos HTTPS.'}
+    var q,qd;
+    if(mx&&mx.ok){q=mx.mx?5:0;qd=mx.mx?'Tiene servidor de mail propio.':'No tiene mail propio configurado (se contactan solo por redes o webmail).'}
+    else{q=2;qd='No pudimos revisar el mail del dominio.'}
+    s=h+q;sd=hd+' '+qd;
+  }
+  R.push({n:'Seguridad y contacto',v:s,m:15,d:sd});
+  // Identidad fiscal (20)
+  var f,fd;
+  if(cuit){f=cuit.ok?14:0;fd=cuit.msg}
+  else{f=6;fd='No ingresaste CUIT. Una tienda formal debería mostrarlo.'}
+  if(pos.c6&&(!cuit||cuit.ok))f=Math.min(20,f+6);
+  if(risk.c2)f=Math.max(0,f-6);
+  R.push({n:'Identidad fiscal',v:f,m:20,d:fd});
+  // Lo que observaste (15): pesa menos que los chequeos automáticos
+  var nr=Object.keys(risk).filter(function(k){return risk[k]&&k!=='c2'}).length;
+  var np=Object.keys(pos).filter(function(k){return pos[k]&&k!=='c6'}).length;
+  R.push({n:'Lo que observaste',v:clamp(8+np*3-nr*4,0,15),m:15,d:nr+' señales de riesgo y '+np+' positivas marcadas.'});
+  // Comunidad (15)
+  R.push({n:'Comunidad',v:clamp(7+com.ok-com.mala*3,0,15),m:15,d:com.total?com.total+' reportes ('+com.ok+' buenos, '+com.mala+' con problemas).':'Todavía no hay reportes de esta tienda.'});
+  var tot=R.reduce(function(x,y){return x+y.v},0);
+  return{R:R,tot:clamp(Math.round(tot),0,100)};
+}
+function nivel(n){
+  if(n>=70)return{t:'Señales favorables',c:'#15803D',todo:['Igual verificá el CUIT en ARCA.','Pagá con tarjeta o Mercado Pago si es posible.','Guardá capturas y comprobantes.']};
+  if(n>=40)return{t:'Precaución',c:'#B45309',todo:['Pedí factura y verificá el CUIT en ARCA.','Preguntá por cambios y devoluciones antes de pagar.','Evitá transferir: usá un medio con protección.']};
+  return{t:'Riesgo alto',c:'#B91C1C',todo:['No transfieras dinero.','Buscá opiniones de compradores reales fuera de la web de la tienda.','Si ya pagaste, contactá a tu banco o a Defensa del Consumidor.']};
+}
+
+/* Comunidad (Supabase) */
+var sb=null,exps=[],mine=[];
+try{mine=JSON.parse(localStorage.getItem('sv_mine')||'[]')}catch(e){}
+function loadSB(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=function(){sb=supabase.createClient(SB_URL,SB_KEY);cargar()};s.onerror=function(){$('list').textContent='No se pudo conectar con la comunidad.'};document.head.appendChild(s)}
+function normT(x){return (x||'').toLowerCase().replace(/^https?:\/\//,'').replace(/^www\./,'').split('/')[0].replace(/^@/,'').trim()}
+function comDe(dom){
+  var n=normT(dom),f=exps.filter(function(x){var t=normT(x.tienda);return t&&n&&(t===n||t.indexOf(n)!==-1||n.indexOf(t)!==-1)});
+  return{total:f.length,ok:f.filter(function(x){return x.tipo==='ok'}).length,mala:f.filter(function(x){return x.tipo==='mala'}).length};
+}
+var IMG_OK=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/;
+async function cargar(){
+  var r=await sb.from('experiencias').select('*').order('id',{ascending:false}).limit(80);
+  if(r.error){$('list').textContent='No se pudieron cargar las experiencias.';return}
+  exps=r.data||[];
+  var ok=exps.filter(function(x){return x.tipo==='ok'}).length,du=exps.filter(function(x){return x.tipo==='dudosa'}).length,ma=exps.filter(function(x){return x.tipo==='mala'}).length;
+  $('sum').innerHTML='<b>Resumen de la comunidad</b><p class="hint">'+ok+' buenas · '+du+' dudosas · '+ma+' con problemas</p>';
+  if(!exps.length){$('list').innerHTML='<p class="hint">Todavía no hay experiencias. Sé el primero en contar la tuya.</p>';return}
+  $('list').innerHTML=exps.map(function(d){
+    var ic=d.tipo==='ok'?'🟢':d.tipo==='mala'?'🔴':'🟡';
+    var img=(typeof d.foto==='string'&&IMG_OK.test(d.foto))?'<img src="'+d.foto+'" alt="Foto adjunta" loading="lazy">':'';
+    var del=mine.indexOf(d.id)!==-1?'<button data-del="'+Number(d.id)+'">Borrar mi reporte</button>':'';
+    var rep='<a href="mailto:esberreta@gmail.com?subject='+encodeURIComponent('Reportar contenido #'+d.id)+'">Reportar contenido</a>';
+    return '<div class="exp"><b>'+ic+' '+esc(d.tienda)+'</b><div style="margin-top:6px">'+esc(d.texto)+'</div>'+img+'<div class="m">'+rep+del+'</div></div>';
+  }).join('');
+}
+$('list').onclick=async function(e){
+  var id=e.target.getAttribute&&e.target.getAttribute('data-del');if(!id||!sb)return;
+  if(!confirm('¿Borrar tu reporte?'))return;
+  var r=await sb.from('experiencias').delete().eq('id',Number(id));
+  if(r.error){alert('No se pudo borrar.');return}
+  mine=mine.filter(function(x){return x!==Number(id)});localStorage.setItem('sv_mine',JSON.stringify(mine));cargar();
 };
-function saveHist(domain, resultado, icon){ try{ var h=JSON.parse(localStorage.getItem('ss_hist')||'[]'); h.unshift({d:domain,r:resultado,i:icon,fecha:new Date().toISOString()}); h=h.slice(0,12); localStorage.setItem('ss_hist',JSON.stringify(h)); }catch(e){} }
-function renderHist(){ var cont=document.getElementById('histList'); try{ var h=JSON.parse(localStorage.getItem('ss_hist')||'[]'); if(h.length===0){cont.innerHTML='Sin análisis previos';return} cont.innerHTML=h.map(x=>'<div class="hist-item"><span><b>'+x.i+' '+x.d+'</b><br><span class="small">'+new Date(x.fecha).toLocaleString('es-AR')+'</span></span><span style="font-size:11px;text-align:right">'+x.r+'</span></div>').join(''); }catch(e){cont.innerHTML='Sin análisis previos'} }
-document.getElementById('btnClearHist').onclick=function(){localStorage.removeItem('ss_hist');renderHist();}; renderHist();
-var supabaseClient=null; var misReportes=JSON.parse(localStorage.getItem('misReportes')||'[]'); var todasExps=[];
-function loadSupabase(){ var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'; s.onload=function(){supabaseClient=supabase.createClient('https://ltaghuumilyjdzpmatqj.supabase.co','sb_publishable_KXmx7LEqpZ3g5u-iRMeyDA__bWJBbqH');cargarExps();}; document.head.appendChild(s); }
-loadSupabase();
-async function cargarExps(){ var cont=document.getElementById('listaExp'); var resumen=document.getElementById('resumenExp'); if(!supabaseClient){cont.innerHTML='Conectando...';return} var r=await supabaseClient.from('experiencias').select('*').order('id',{ascending:false}).limit(80); if(r.error){cont.innerHTML='Error: '+r.error.message;return} todasExps=r.data||[]; if(todasExps.length==0){ cont.innerHTML='<p class=small>Sin experiencias.</p>'; resumen.innerHTML='<b>Comunidad</b><br><span class=small>Sin experiencias.</span>'; return; } var ok=todasExps.filter(x=>x.tipo==='ok').length; var dud=todasExps.filter(x=>x.tipo==='dudosa').length; var mal=todasExps.filter(x=>x.tipo==='mala').length; resumen.innerHTML='<b>👥 Resumen comunidad</b><div class="state-row"><span class="state">🟢 Bien: '+ok+'</span><span class="state">🟡 Dudosa: '+dud+'</span><span class="state">🔴 Probl: '+mal+'</span></div>'; var html=''; for(var i=0;i<todasExps.length;i++){ var d=todasExps[i]; var img=''; if(d.foto){img='<img src="'+d.foto+'" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-top:8px">';} var tipoIcon=d.tipo==='ok'?'🟢':d.tipo==='mala'?'🔴':'🟡'; var esMio=misReportes.indexOf(d.id)!==-1; var btnDel=esMio?'<button class=del onclick="borrarExp('+d.id+')">🗑️ Borrar</button>':''; html+='<div class=exp-card><b>'+tipoIcon+' '+escapeHtml(d.tienda)+'</b><div style="margin-top:6px;font-size:13px">'+escapeHtml(d.texto)+'</div>'+img+'<br>'+btnDel+'</div>'; } cont.innerHTML=html; }
-function escapeHtml(s){ if(!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function renderExpSummaryForDomain(domainRaw){ var cont=document.getElementById('resExpSum'); if(!cont) return; if(!domainRaw || todasExps.length===0){ cont.innerHTML='Sin experiencias para este dominio.'; return; } var norm=domainRaw.toLowerCase().replace(/https?:\/\//,'').replace(/^www\./,'').split('/')[0].replace(/^@/,''); var filtered=todasExps.filter(x=>{ var t=(x.tienda||'').toLowerCase(); return t.includes(norm) || norm.includes(t.replace(/@/g,'')); }); if(filtered.length===0){ cont.innerHTML='Sin experiencias para <b>'+escapeHtml(domainRaw)+'</b>.'; return; } var ok=filtered.filter(x=>x.tipo==='ok').length; var mal=filtered.filter(x=>x.tipo==='mala').length; cont.innerHTML=filtered.length+' reportes.'; }
-async function borrarExp(id){ if(!confirm('¿Borrar?')) return; var r=await supabaseClient.from('experiencias').delete().eq('id',id); if(r.error){alert('Error');return} misReportes=misReportes.filter(x=>x!==id); localStorage.setItem('misReportes',JSON.stringify(misReportes)); cargarExps(); }
-window.borrarExp=borrarExp;
-document.getElementById('btnPub').onclick=async function(){
- if(!supabaseClient){alert('Esperá 2 seg...');return}
- var tienda=document.getElementById('expTienda').value.trim(); var texto=document.getElementById('expTexto').value.trim(); var nombre=document.getElementById('expNombre').value.trim()||'Anónimo'; var tipo=document.getElementById('expTipo').value;
- if(!tienda||!texto){alert('Completa tienda');return}
- var btn=this;btn.innerHTML='Publicando...';btn.disabled=true;
- var file=document.getElementById('expFoto').files[0];var foto=null;
- if(file){foto=await new Promise(function(res){var r=new FileReader();r.onload=function(e){res(e.target.result);};r.readAsDataURL(file);});}
- var payload={nombre:nombre,tienda:tienda,texto:texto,foto:foto,tipo:tipo};
- var result=await supabaseClient.from('experiencias').insert([payload]).select();
- if(result.error){ alert(result.error.message); } else { var nuevoId=result.data&&result.data[0]&&result.data[0].id; if(nuevoId){misReportes.push(nuevoId);localStorage.setItem('misReportes',JSON.stringify(misReportes));} document.getElementById('expTienda').value='';document.getElementById('expTexto').value=''; cargarExps(); }
- btn.innerHTML='Publicar experiencia';btn.disabled=false;
+// Comprime la foto a máx. 800px JPEG para no llenar la base
+function comprimir(file){return new Promise(function(res,rej){
+  var img=new Image(),u=URL.createObjectURL(file);
+  img.onload=function(){var k=Math.min(1,800/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',0.6))};
+  img.onerror=function(){rej()};img.src=u;
+})}
+$('pub').onclick=async function(){
+  if(!sb){alert('Esperá un momento: conectando...');return}
+  var last=+localStorage.getItem('sv_last')||0;
+  if(Date.now()-last<60000){alert('Esperá un minuto antes de publicar otra experiencia.');return}
+  var tienda=$('eS').value.trim(),texto=$('eX').value.trim();
+  if(!tienda||texto.length<15){alert('Completá la tienda y contá qué pasó (mínimo 15 caracteres).');return}
+  var b=this;b.disabled=true;b.textContent='Publicando...';
+  var foto=null,file=$('eF').files[0];
+  try{if(file){if(!/^image\/(jpeg|png|webp)$/.test(file.type))throw 'tipo';foto=await comprimir(file)}}
+  catch(e){alert('La foto no es válida. Usá JPG, PNG o WebP.');b.disabled=false;b.textContent='Publicar experiencia';return}
+  var r=await sb.from('experiencias').insert([{nombre:$('eN').value.trim().slice(0,40)||'Anónimo',tienda:tienda.slice(0,80),texto:texto.slice(0,600),foto:foto,tipo:$('eT').value}]).select();
+  if(r.error)alert('No se pudo publicar: '+r.error.message);
+  else{var id=r.data&&r.data[0]&&r.data[0].id;if(id){mine.push(id);localStorage.setItem('sv_mine',JSON.stringify(mine))}localStorage.setItem('sv_last',Date.now());$('eS').value='';$('eX').value='';$('eF').value='';cargar()}
+  b.disabled=false;b.textContent='Publicar experiencia';
 };
+
+/* Análisis (solo al tocar el botón o Enter) */
+async function analizar(){
+  var dom=parseDomain($('url').value);
+  if(!dom){alert('Pegá un link válido, por ejemplo tienda.com.ar o @tienda');return}
+  var btn=$('go');btn.disabled=true;btn.textContent='Analizando...';
+  var cuitRaw=$('cuit').value.trim(),cuit=cuitRaw?validarCUIT(cuitRaw):null;
+  var web=dom.type==='web';
+  $('res').style.display='none';
+  var steps=web?[['Registro del dominio',domainAge(dom.domain)],['Historial en Wayback Machine',wayback(dom.domain)],['Mail y DNS',dnsMX(dom.domain)]]:[['Cuenta de red social',Promise.resolve(null)]];
+  steps.push(['Identidad fiscal',Promise.resolve(null)]);
+  $('scan').classList.remove('hidden');
+  $('steps').innerHTML=steps.map(function(x){return '<li><i></i>'+esc(x[0])+'</li>'}).join('');
+  var lis=$('steps').children;
+  var all=await Promise.all(steps.map(function(x,i){return x[1].then(function(v){return new Promise(function(r){setTimeout(function(){lis[i].className='done';r(v)},350*i)})})}));
+  await new Promise(function(r){setTimeout(r,300)});
+  $('scan').classList.add('hidden');
+  var age=web?all[0]:null,ex={wb:web?all[1]:null,mx:web?all[2]:null};
+  var risk={},pos={};['c1','c2','c3','c4','c5'].forEach(function(i){risk[i]=$(i).checked});['c6','c7','c8'].forEach(function(i){pos[i]=$(i).checked});
+  var out=puntuar(dom,age,cuit,risk,pos,comDe(dom.domain),ex),lv=nivel(out.tot);
+  $('res').style.display='block';
+  $('num').style.color=lv.c;
+  var arc=$('arc'),end=352-352*out.tot/100;arc.style.stroke=lv.c;arc.style.transition='none';arc.style.strokeDashoffset=352;arc.getBoundingClientRect();
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){$('num').textContent=out.tot;arc.style.strokeDashoffset=end}
+  else{arc.style.transition='stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)';arc.style.strokeDashoffset=end;var t0=performance.now();(function tick(t){var k=Math.min(1,(t-t0)/1000);$('num').textContent=Math.round(out.tot*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(tick)})(t0)}
+  window._share={d:dom.domain,n:out.tot,l:lv.t};
+  $('lvl').textContent=lv.t;$('lvl').style.color=lv.c;
+  $('dom').textContent=dom.domain;$('when').textContent=new Date().toLocaleString('es-AR');
+  $('rows').innerHTML=out.R.map(function(r,i){var ic=['🗓️','🔒','🧾','👁️','👥'][i]||'•',p=r.v/r.m*100,col=p>=70?'#15803D':p>=40?'#B45309':'#B91C1C';
+    return '<div class="row"><div class="h"><span>'+ic+' '+esc(r.n)+'</span><span>'+r.v+' / '+r.m+'</span></div><div class="bar"><i style="width:'+p+'%;background:'+col+'"></i></div><div class="d">'+esc(r.d)+'</div></div>'}).join('');
+  $('todo').innerHTML=lv.todo.map(function(t){return '<li>'+esc(t)+'</li>'}).join('');
+  saveH(dom.domain,out.tot,lv.t);renderH();
+  $('res').scrollIntoView({behavior:'smooth',block:'start'});
+  btn.disabled=false;btn.textContent='Calcular puntaje';
+}
+$('go').onclick=analizar;
+$('url').onkeydown=function(e){if(e.key==='Enter')analizar()};
+
+/* Historial local */
+function saveH(d,n,t){try{var h=JSON.parse(localStorage.getItem('sv_hist')||'[]');h.unshift({d:d,n:n,t:t,f:new Date().toISOString()});localStorage.setItem('sv_hist',JSON.stringify(h.slice(0,12)))}catch(e){}}
+function renderH(){try{var h=JSON.parse(localStorage.getItem('sv_hist')||'[]');$('hist').innerHTML=h.length?h.map(function(x){return '<div class="hi"><span><b>'+esc(x.d)+'</b><br>'+new Date(x.f).toLocaleDateString('es-AR')+'</span><span>'+Number(x.n)+'/100 · '+esc(x.t)+'</span></div>'}).join(''):'Sin análisis previos.'}catch(e){}}
+$('clrH').onclick=function(){localStorage.removeItem('sv_hist');renderH()};
+$('ej').onclick=function(e){var u=e.target.getAttribute&&e.target.getAttribute('data-u');if(u){$('url').value=u;analizar()}};
+$('share').onclick=function(){var x=window._share;if(!x)return;window.open('https://wa.me/?text='+encodeURIComponent('Analicé '+x.d+' en Store Verifier: '+x.n+'/100 ('+x.l+'). Verificá antes de pagar: '+location.origin),'_blank','noopener')};
+renderH();loadSB();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');
 </script>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js');
-}
-</script>
-  <div style="width:100%; text-align:center; padding:15px 0; background:#f5f5f5; border-top:2px dashed #ccc; margin-top:20px;">
-  <p style="margin:0 0 8px 0; font-family:Arial; font-size:14px; color:#333;">👇 Si querés apoyarnos 👇</p>
-  <a href="https://omg10.com/4/11795030" target="_blank" style="display:inline-block; background:#ff6a00; color:white; font-family:Arial Black; padding:12px 25px; border-radius:50px; text-decoration:none; font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
-    Apretá este anuncio, nos ayudás a ganar $
-  </a>
-</div>
 </body>
 </html>
