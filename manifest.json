@@ -1,6 +1,6 @@
 {
-  "name": "SafeStore - Verificá antes de pagar",
-  "short_name": "SafeStore",
+  "name": "Store Verifier - Verificá antes de pagar",
+  "short_name": "SV",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0F2C61",
