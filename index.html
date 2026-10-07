@@ -86,6 +86,18 @@ header{background-image:radial-gradient(rgba(255,255,255,.08) 1px,transparent 1p
 @keyframes sp{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.steps i{animation:none}.btn:hover,.chk:hover{transform:none}}
 #share{margin-top:14px}
+
+.crit{background:#FEF3F3;border:2px solid #B91C1C;border-radius:12px;padding:14px;margin:14px 0 4px;color:#7F1D1D}
+.crit p{margin-top:6px;font-size:14px}
+.rec{border:1.5px solid var(--line);border-radius:12px;padding:14px;margin-top:8px}
+.rec p{font-size:14px;margin-top:4px}
+details.sig{margin-top:6px;border:1px solid var(--line);border-radius:10px;background:#fff}
+details.sig summary{cursor:pointer;padding:9px 12px;font-size:13.5px;font-weight:600;list-style:none}
+details.sig summary::-webkit-details-marker{display:none}
+details.sig[open]{border-color:#9DB4E8;background:#F7F9FF}
+.sb{padding:0 12px 10px;font-size:13px}.sb p{margin-top:6px}
+details.how{margin-top:14px;font-size:13px;color:var(--mute)}details.how summary{cursor:pointer;font-weight:700;color:var(--ink)}details.how p{margin-top:8px}
+#payBtn{margin-top:12px}
 </style>
 </head>
 <body>
@@ -131,9 +143,13 @@ header{background-image:radial-gradient(rgba(255,255,255,.08) 1px,transparent 1p
 <div class="gauge"><svg width="132" height="132" viewBox="0 0 132 132"><circle cx="66" cy="66" r="56" fill="none" stroke="#E8EDF5" stroke-width="12"/><circle id="arc" cx="66" cy="66" r="56" fill="none" stroke="#999" stroke-width="12" stroke-linecap="round" stroke-dasharray="352" stroke-dashoffset="352"/></svg><div class="n"><span id="num">0</span><small>de 100</small></div></div>
 <div><div class="lvl" id="lvl"></div><div class="dom" id="dom"></div><div class="hint" id="when"></div></div>
 </div>
+<div id="alert"></div>
 <div id="rows"></div>
-<h2>Qué te recomendamos</h2>
-<ul class="todo" id="todo"></ul>
+<h2>¿Qué recomendamos?</h2>
+<div id="rec"></div>
+<button class="btn sec" id="payBtn" type="button">¿Estás por pagar? Revisá esto</button>
+<div id="payBox" class="hidden"></div>
+<details class="how"><summary>¿Cómo calculamos este puntaje?</summary><p>El resultado combina señales técnicas (dominio, conexión, seguridad), información comercial (CUIT, domicilio, políticas), métodos de pago, actividad pública y experiencias de la comunidad. Algunas señales pesan más que otras: identidad comercial y antigüedad son las de mayor peso, y un solo reporte de la comunidad no cambia el resultado por sí solo.</p><p>Cuando un dato no se puede verificar, lo marcamos como 🟡 y no lo damos por bueno ni por malo. Los resultados automáticos pueden ser incompletos. Store Verifier no garantiza que una compra sea segura.</p></details>
 <button class="btn sec" id="share" type="button">Compartir por WhatsApp</button>
 <p class="note">Este puntaje es orientativo y se basa en señales observables. No es un veredicto: ninguna herramienta garantiza que una tienda sea segura. Ante la duda, pagá con tarjeta o Mercado Pago y guardá los comprobantes.</p>
 </div>
@@ -238,56 +254,92 @@ async function dnsMX(d){
   }catch(e){return{ok:false}}finally{clearTimeout(t)}
 }
 
-/* Puntaje de fiabilidad: más alto = más confiable. Suma máxima 100 */
-function puntuar(dom,age,cuit,risk,pos,com,ex){
-  var R=[],wb=ex.wb,mx=ex.mx;
-  // Dominio (35): usa el registro oficial; si no hay, el historial de Wayback como mínimo
-  var dias=null,ad='';
-  if(dom.type==='social'){R.push({n:'Antigüedad del dominio',v:12,m:35,d:'Es una cuenta de red social: no hay dominio para medir.'})}
-  else{
-    if(age&&age.ok){dias=age.dias;ad='Registrado hace '+age.dias+' días ('+age.fecha.toLocaleDateString('es-AR')+').'}
-    else if(wb&&wb.ok&&!wb.none){dias=wb.dias;ad='Sin dato oficial de registro. Pero el sitio ya existía hace al menos '+wb.dias+' días (primer archivo en Wayback Machine).'}
-    var a;
-    if(dias===null){a=12;ad=(wb&&wb.ok&&wb.none)?'No pudimos obtener la fecha de registro y el sitio no tiene historial público. Puntaje bajo-neutro.':'No pudimos consultar la antigüedad. Puntaje neutro.';if(wb&&wb.ok&&wb.none)a=8}
-    else a=dias<15?0:dias<90?9:dias<365?21:35;
-    if(age&&age.ok&&wb&&wb.ok&&!wb.none&&wb.dias>age.dias+30)ad+=' Ojo: el historial es anterior al registro actual (el dominio pudo cambiar de dueño).';
-    R.push({n:'Antigüedad del dominio',v:a,m:35,d:ad});
-  }
-  // Seguridad y contacto (15): HTTPS (10) + mail propio (5)
-  var s,sd;
-  if(dom.type==='social'){s=8;sd='No aplica a redes sociales.'}
-  else{
-    var h,hd;
-    if(dom.ip){h=0;hd='Usa una dirección IP en vez de un nombre.'}
-    else if(dom.typed&&!dom.https){h=0;hd='El link está en HTTP, sin cifrado.'}
-    else{h=10;hd=dom.typed?'Conexión HTTPS.':'Asumimos HTTPS.'}
-    var q,qd;
-    if(mx&&mx.ok){q=mx.mx?5:0;qd=mx.mx?'Tiene servidor de mail propio.':'No tiene mail propio configurado (se contactan solo por redes o webmail).'}
-    else{q=2;qd='No pudimos revisar el mail del dominio.'}
-    s=h+q;sd=hd+' '+qd;
-  }
-  R.push({n:'Seguridad y contacto',v:s,m:15,d:sd});
-  // Identidad fiscal (20)
-  var f,fd;
-  if(cuit){f=cuit.ok?14:0;fd=cuit.msg}
-  else{f=6;fd='No ingresaste CUIT. Una tienda formal debería mostrarlo.'}
-  if(pos.c6&&(!cuit||cuit.ok))f=Math.min(20,f+6);
-  if(risk.c2)f=Math.max(0,f-6);
-  R.push({n:'Identidad fiscal',v:f,m:20,d:fd});
-  // Lo que observaste (15): pesa menos que los chequeos automáticos
-  var nr=Object.keys(risk).filter(function(k){return risk[k]&&k!=='c2'}).length;
-  var np=Object.keys(pos).filter(function(k){return pos[k]&&k!=='c6'}).length;
-  R.push({n:'Lo que observaste',v:clamp(8+np*3-nr*4,0,15),m:15,d:nr+' señales de riesgo y '+np+' positivas marcadas.'});
-  // Comunidad (15)
-  R.push({n:'Comunidad',v:clamp(7+com.ok-com.mala*3,0,15),m:15,d:com.total?com.total+' reportes ('+com.ok+' buenos, '+com.mala+' con problemas).':'Todavía no hay reportes de esta tienda.'});
-  var tot=R.reduce(function(x,y){return x+y.v},0);
-  return{R:R,tot:clamp(Math.round(tot),0,100)};
+var API='https://store-verifier-api.9fwkhmmnr2.workers.dev';
+async function apiGet(d){var c=new AbortController(),t=setTimeout(function(){c.abort()},15000);try{var r=await fetch(API+'/?domain='+encodeURIComponent(d),{signal:c.signal});if(!r.ok)throw 0;return await r.json()}catch(e){return null}finally{clearTimeout(t)}}
+var NV='No pudo verificarse automáticamente.';
+var SHORT=['bit.ly','tinyurl.com','t.co','goo.gl','cutt.ly','is.gd','ow.ly','rebrand.ly','shorturl.at'];
+var CATS=[['Identidad comercial','🧾',22],['Sitio web','🔒',15],['Métodos de pago','💳',18],['Redes sociales','📱',10],['Comunidad','👥',15],['Antigüedad','🗓️',20]];
+var Wage=['Los dominios muy nuevos son más comunes en tiendas que aparecen y desaparecen rápido.','No demuestra que la tienda sea fraudulenta: hay negocios legítimos recién abiertos.','Combinalo con CUIT, medios de pago y opiniones antes de decidir.'];
+var Wcuit=['Un comercio formal suele mostrar su CUIT para que puedas saber quién vende.','Que no lo muestre no prueba fraude, y un CUIT con formato válido no prueba que sea del vendedor: solo revisamos el formato.','Pedí CUIT y razón social, y confirmalos en ARCA (constancia de inscripción).'];
+var Wdom=['Datos de contacto y políticas claras facilitan reclamar si algo sale mal.','Que no las encontremos puede deberse a cómo está armada la página.','Buscá domicilio, cambios y devoluciones antes de pagar.'];
+var Wsec=['La conexión cifrada y las listas de seguridad ayudan a detectar sitios peligrosos.','Un resultado limpio no garantiza seguridad, y que falte el dato no significa que sea peligroso.','No ingreses datos personales ni de tarjeta si el navegador muestra advertencias.'];
+var Wpay=['Tarjeta y Mercado Pago pueden facilitar reclamos si el producto no llega o hay una disputa.','Ningún medio de pago garantiza que una tienda sea segura. La transferencia no es un fraude en sí misma.','Si podés, pagá con un medio con protección y guardá los comprobantes.'];
+var Wnet=['Las redes ayudan a ver si hay un negocio activo detrás de la tienda.','No podemos medir actividad ni antigüedad de redes automáticamente. Que no tenga redes no es una estafa por sí solo.','Entrá a sus redes, mirá desde cuándo publican y si hay clientes reales opinando.'];
+var Wcom=['Las experiencias de otros compradores son una fuente valiosa.','Un solo reporte no define a una tienda: puede haber errores o reportes falsos.','Leé los reportes en la pestaña Comunidad y fijate en fechas y detalles.'];
+function sg(c,e,f,t,d,w){return{c:c,e:e,f:f,t:t,d:d,w:w}}
+
+function evaluar(dom,age,wb,mx,api,cuit,risk,pos,com){
+  var S=[],al=[],web=dom.type==='web';
+  var P=api&&api.pagina&&api.pagina.ok?api.pagina:null,sb=api&&api.seguridad;
+  // Antigüedad
+  var dias=null,fz='';
+  if(age&&age.ok){dias=age.dias;fz='Registrado hace '+age.dias+' días ('+age.fecha.toLocaleDateString('es-AR')+').'}
+  else if(wb&&wb.ok&&!wb.none){dias=wb.dias;fz='Sin fecha oficial de registro, pero el sitio ya estaba archivado hace al menos '+wb.dias+' días.'}
+  if(!web)S.push(sg('Antigüedad','y',.5,'Cuenta de red social','No hay dominio para medir. '+NV,Wage));
+  else if(dias===null)S.push(sg('Antigüedad','y',.5,'Antigüedad desconocida',NV+(wb&&wb.ok&&wb.none?' Además, el sitio no tiene historial público.':''),Wage));
+  else if(dias<30)S.push(sg('Antigüedad','r',0,'Dominio creado recientemente',fz,Wage));
+  else if(dias<180)S.push(sg('Antigüedad','y',.5,'Dominio con poca antigüedad',fz,Wage));
+  else S.push(sg('Antigüedad','g',1,'Dominio con trayectoria',fz,Wage));
+  // Sitio web
+  if(web){
+    if(dom.ip)S.push(sg('Sitio web','r',0,'Usa una dirección IP','Se accede por IP y no por un nombre de dominio.',Wsec));
+    else if(dom.typed&&!dom.https)S.push(sg('Sitio web','r',0,'Sin HTTPS','El link usa HTTP, sin cifrado.',Wsec));
+    else S.push(sg('Sitio web','g',1,'Conexión segura (HTTPS)',dom.typed?'El link usa HTTPS.':'No escribiste el protocolo; asumimos HTTPS.',Wsec));
+    if(SHORT.indexOf(dom.domain)!==-1){S.push(sg('Sitio web','r',0,'Acortador de enlaces','El link usa un acortador, que oculta el destino real.',Wsec));al.push('El link usa un acortador y no se ve el sitio real. Pedí la dirección completa antes de seguir.')}
+    if(P&&P.hostFinal&&P.hostFinal.replace(/^www\./,'')!==dom.domain)S.push(sg('Sitio web','y',.5,'Redirige a otro dominio','El link termina en '+P.hostFinal+'.',Wsec));
+    if(mx&&mx.ok)S.push(sg('Sitio web',mx.mx?'g':'y',mx.mx?1:.4,mx.mx?'Tiene mail propio':'Sin mail propio',mx.mx?'El dominio tiene servidor de mail configurado.':'No encontramos mail configurado en el dominio.',Wsec));
+    if(sb&&sb.ok&&sb.amenazas&&sb.amenazas.length){S.push(sg('Sitio web','r',0,'Marcado como peligroso','Google Safe Browsing lo asocia con: '+sb.amenazas.join(', ')+'.',Wsec));al.push('Encontramos señales asociadas con un sitio potencialmente peligroso. Evitá ingresar datos personales o pagar hasta verificar la situación.')}
+    else if(sb&&sb.ok)S.push(sg('Sitio web','g',1,'Sin alertas de seguridad','Google Safe Browsing no lo marca como peligroso.',Wsec));
+    else S.push(sg('Sitio web','y',.5,'Chequeo de phishing y malware',NV,Wsec));
+    if(!P)S.push(sg('Sitio web','y',.5,'Lectura de la página de la tienda','No pudimos leer la página. Los datos de pagos, CUIT y políticas dependen de ella.',Wsec));
+  }else S.push(sg('Sitio web','y',.5,'Sin sitio web para revisar',NV,Wsec));
+  if(risk.c3)S.push(sg('Sitio web','r',0,'Precios irreales o presión para pagar (marcado por vos)','Lo marcaste manualmente.',Wsec));
+  if(risk.c5)S.push(sg('Sitio web','r',0,'Fotos robadas o solo WhatsApp (marcado por vos)','Lo marcaste manualmente.',Wsec));
+  // Identidad comercial
+  if(cuit)S.push(sg('Identidad comercial',cuit.ok?'g':'r',cuit.ok?.8:0,cuit.ok?'CUIT con formato válido':'CUIT con inconsistencias',cuit.msg,Wcuit));
+  else if(P&&P.cuits&&P.cuits.length){var cv=P.cuits.filter(function(x){return x.valido});S.push(sg('Identidad comercial',cv.length?'g':'r',cv.length?.8:0,cv.length?'CUIT encontrado en la tienda':'CUIT inválido en la tienda','CUIT detectado: '+P.cuits[0].cuit+'. Solo revisamos el formato; confirmalo en ARCA.',Wcuit))}
+  else if(P)S.push(sg('Identidad comercial','y',.4,'La tienda no muestra CUIT','No lo encontramos en su página.',Wcuit));
+  else S.push(sg('Identidad comercial','y',.5,'CUIT',NV,Wcuit));
+  if(P)S.push(sg('Identidad comercial',P.contacto&&P.contacto.domicilio?'g':'y',P.contacto&&P.contacto.domicilio?.8:.4,P.contacto&&P.contacto.domicilio?'Menciona domicilio o dirección':'No vemos domicilio','Detectado en el texto de la página.',Wdom));
+  if(P){var pc=P.politicas&&(P.politicas.cambios_devoluciones||P.politicas.arrepentimiento);S.push(sg('Identidad comercial',pc?'g':'y',pc?1:.4,pc?'Menciona cambios, devoluciones o arrepentimiento':'No encontramos políticas de cambio','Detectado en el texto de la página.',Wdom))}
+  if(pos.c6)S.push(sg('Identidad comercial','g',1,'CUIT y domicilio verificables (marcado por vos)','Lo marcaste manualmente.',Wcuit));
+  if(risk.c2)S.push(sg('Identidad comercial','r',0,'No muestra CUIT ni domicilio (marcado por vos)','Lo marcaste manualmente.',Wcuit));
+  if(risk.c4)S.push(sg('Identidad comercial','r',0,'Sin política de cambios (marcado por vos)','Lo marcaste manualmente.',Wdom));
+  // Pagos
+  var prot=P&&P.pagos&&(P.pagos.mercadopago||P.pagos.tarjeta),tr=P&&P.pagos&&P.pagos.transferencia,tonly=(P&&tr&&!prot)||risk.c1;
+  if(P){
+    if(prot)S.push(sg('Métodos de pago','g',1,'Ofrece medios con protección','Detectamos '+(P.pagos.mercadopago?'Mercado Pago':'')+(P.pagos.mercadopago&&P.pagos.tarjeta?' y ':'')+(P.pagos.tarjeta?'tarjeta':'')+(tr?' (y también transferencia)':'')+'.',Wpay));
+    else if(tr)S.push(sg('Métodos de pago','r',0,'Solo transferencia bancaria','Solo detectamos transferencia como medio de pago.',Wpay));
+    else S.push(sg('Métodos de pago','y',.5,'No detectamos medios de pago','Muchas tiendas los muestran recién al finalizar la compra.',Wpay));
+  }else if(!risk.c1&&!pos.c7)S.push(sg('Métodos de pago','y',.5,'Métodos de pago',NV+' Podés marcarlos abajo.',Wpay));
+  if(risk.c1)S.push(sg('Métodos de pago','r',0,'Solo transferencia bancaria (marcado por vos)','Lo marcaste manualmente.',Wpay));
+  if(pos.c7)S.push(sg('Métodos de pago','g',1,'Medios con protección (marcado por vos)','Lo marcaste manualmente.',Wpay));
+  // Redes
+  if(pos.c8)S.push(sg('Redes sociales','g',1,'Redes activas (marcado por vos)','Lo marcaste manualmente.',Wnet));
+  if(P&&P.redes&&P.redes.length)S.push(sg('Redes sociales','g',.75,'Enlaza redes sociales','Encontramos: '+P.redes.slice(0,3).join(', ')+'. No pudimos verificar su actividad.',Wnet));
+  else if(!web)S.push(sg('Redes sociales','y',.5,'Cuenta de red social','No podemos verificar actividad ni antigüedad automáticamente.',Wnet));
+  else if(!pos.c8)S.push(sg('Redes sociales','y',.5,P?'No encontramos redes enlazadas':'Redes sociales',P?'La página no enlaza redes. Tampoco prueba nada por sí solo.':NV,Wnet));
+  // Comunidad
+  var du=com.total-com.ok-com.mala;
+  var cs=com.total===0?'y':(com.mala>=2&&com.mala>com.ok)?'r':(com.ok>=2&&com.ok>=com.mala)?'g':'y';
+  S.push(sg('Comunidad',cs,(com.ok+du*.5+2)/(com.total+4),com.total?com.total+' experiencias registradas':'Sin experiencias registradas',com.total?com.ok+' positivas, '+du+' neutrales, '+com.mala+' negativas.':'Todavía no hay reportes de esta tienda.',Wcom));
+  // Categorías y total
+  var cats=CATS.map(function(c){var xs=S.filter(function(x){return x.c===c[0]});return{n:c[0],i:c[1],w:c[2],S:xs,v:xs.length?Math.round(xs.reduce(function(a,b){return a+b.f},0)/xs.length*100):null}});
+  var vs=cats.filter(function(c){return c.v!==null}),tot=Math.round(vs.reduce(function(a,c){return a+c.v*c.w},0)/vs.reduce(function(a,c){return a+c.w},0));
+  // Alertas críticas (separadas del puntaje)
+  if(dias!==null&&dias<30&&tonly)al.push('Dominio reciente + transferencia bancaria como único medio de pago'+(com.mala>=2?' + reportes negativos':'')+'. Esta combinación requiere mucha precaución.');
+  if(com.mala>=3&&com.mala>com.ok)al.push('Varios compradores reportaron problemas ('+com.mala+' reportes negativos).');
+  var nr=S.filter(function(x){return x.e==='r'});
+  if(nr.length>=3&&!al.length)al.push('Detectamos varias señales de riesgo a la vez: '+nr.slice(0,3).map(function(x){return x.t.toLowerCase()}).join(', ')+'.');
+  return{S:S,cats:cats,tot:clamp(tot,0,100),alerts:al,nr:nr.length};
 }
-function nivel(n){
-  if(n>=70)return{t:'Señales favorables',c:'#15803D',todo:['Igual verificá el CUIT en ARCA.','Pagá con tarjeta o Mercado Pago si es posible.','Guardá capturas y comprobantes.']};
-  if(n>=40)return{t:'Precaución',c:'#B45309',todo:['Pedí factura y verificá el CUIT en ARCA.','Preguntá por cambios y devoluciones antes de pagar.','Evitá transferir: usá un medio con protección.']};
-  return{t:'Riesgo alto',c:'#B91C1C',todo:['No transfieras dinero.','Buscá opiniones de compradores reales fuera de la web de la tienda.','Si ya pagaste, contactá a tu banco o a Defensa del Consumidor.']};
+function recom(ev){
+  if(ev.alerts.length||ev.tot<45)return{c:'#B91C1C',bg:'#FEF3F3',t:'🔴 RIESGO ALTO',lv:'Riesgo alto',x:'Encontramos varias señales importantes de riesgo. Recomendamos no realizar el pago hasta verificar la situación.'};
+  if(ev.tot<70||ev.nr)return{c:'#B45309',bg:'#FFF8EB',t:'🟡 RIESGO MODERADO',lv:'Riesgo moderado',x:'Encontramos algunas señales que conviene verificar antes de pagar.'};
+  return{c:'#15803D',bg:'#F0FAF3',t:'🟢 RIESGO BAJO',lv:'Riesgo bajo',x:'No encontramos señales importantes de riesgo. Podés continuar tomando las precauciones habituales.'};
 }
+var EM={g:'🟢',y:'🟡',r:'🔴'};
+function sigHTML(s){return '<details class="sig"><summary>'+EM[s.e]+' '+esc(s.t)+'</summary><div class="sb"><p><b>Qué detectamos:</b> '+esc(s.d)+'</p><p><b>¿Por qué importa?</b> '+esc(s.w[0])+'</p><p><b>Qué NO significa:</b> '+esc(s.w[1])+'</p><p><b>Qué hacer:</b> '+esc(s.w[2])+'</p></div></details>'}
 
 /* Comunidad (Supabase) */
 var sb=null,exps=[],mine=[];
@@ -351,32 +403,42 @@ async function analizar(){
   var cuitRaw=$('cuit').value.trim(),cuit=cuitRaw?validarCUIT(cuitRaw):null;
   var web=dom.type==='web';
   $('res').style.display='none';
-  var steps=web?[['Registro del dominio',domainAge(dom.domain)],['Historial en Wayback Machine',wayback(dom.domain)],['Mail y DNS',dnsMX(dom.domain)]]:[['Cuenta de red social',Promise.resolve(null)]];
-  steps.push(['Identidad fiscal',Promise.resolve(null)]);
+  var apiP=web?apiGet(dom.domain):Promise.resolve(null);
+  var steps=web?[
+    ['Registro del dominio',apiP.then(function(a){return a&&a.registro&&a.registro.ok?{ok:true,dias:a.registro.dias,fecha:new Date(a.registro.fecha)}:domainAge(dom.domain)})],
+    ['Historial en Wayback Machine',wayback(dom.domain)],
+    ['Mail y DNS',dnsMX(dom.domain)],
+    ['Lectura de la tienda y seguridad',apiP]
+  ]:[['Cuenta de red social',Promise.resolve(null)]];
+  steps.push(['Identidad comercial',Promise.resolve(null)]);
   $('scan').classList.remove('hidden');
   $('steps').innerHTML=steps.map(function(x){return '<li><i></i>'+esc(x[0])+'</li>'}).join('');
   var lis=$('steps').children;
-  var all=await Promise.all(steps.map(function(x,i){return x[1].then(function(v){return new Promise(function(r){setTimeout(function(){lis[i].className='done';r(v)},350*i)})})}));
+  var all=await Promise.all(steps.map(function(x,i){return x[1].then(function(v){return new Promise(function(r){setTimeout(function(){lis[i].className='done';r(v)},300*i)})})}));
   await new Promise(function(r){setTimeout(r,300)});
   $('scan').classList.add('hidden');
-  var age=web?all[0]:null,ex={wb:web?all[1]:null,mx:web?all[2]:null};
   var risk={},pos={};['c1','c2','c3','c4','c5'].forEach(function(i){risk[i]=$(i).checked});['c6','c7','c8'].forEach(function(i){pos[i]=$(i).checked});
-  var out=puntuar(dom,age,cuit,risk,pos,comDe(dom.domain),ex),lv=nivel(out.tot);
+  var ev=evaluar(dom,web?all[0]:null,web?all[1]:null,web?all[2]:null,web?all[3]:null,cuit,risk,pos,comDe(dom.domain)),rc=recom(ev);
   $('res').style.display='block';
-  $('num').style.color=lv.c;
-  var arc=$('arc'),end=352-352*out.tot/100;arc.style.stroke=lv.c;arc.style.transition='none';arc.style.strokeDashoffset=352;arc.getBoundingClientRect();
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches){$('num').textContent=out.tot;arc.style.strokeDashoffset=end}
-  else{arc.style.transition='stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)';arc.style.strokeDashoffset=end;var t0=performance.now();(function tick(t){var k=Math.min(1,(t-t0)/1000);$('num').textContent=Math.round(out.tot*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(tick)})(t0)}
-  window._share={d:dom.domain,n:out.tot,l:lv.t};
-  $('lvl').textContent=lv.t;$('lvl').style.color=lv.c;
+  $('num').style.color=rc.c;
+  var arc=$('arc'),end=352-352*ev.tot/100;arc.style.stroke=rc.c;arc.style.transition='none';arc.style.strokeDashoffset=352;arc.getBoundingClientRect();
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){$('num').textContent=ev.tot;arc.style.strokeDashoffset=end}
+  else{arc.style.transition='stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)';arc.style.strokeDashoffset=end;var t0=performance.now();(function tick(t){var k=Math.min(1,(t-t0)/1000);$('num').textContent=Math.round(ev.tot*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(tick)})(t0)}
+  window._share={d:dom.domain,n:ev.tot,l:rc.lv};
+  $('lvl').textContent=rc.lv;$('lvl').style.color=rc.c;
   $('dom').textContent=dom.domain;$('when').textContent=new Date().toLocaleString('es-AR');
-  $('rows').innerHTML=out.R.map(function(r,i){var ic=['🗓️','🔒','🧾','👁️','👥'][i]||'•',p=r.v/r.m*100,col=p>=70?'#15803D':p>=40?'#B45309':'#B91C1C';
-    return '<div class="row"><div class="h"><span>'+ic+' '+esc(r.n)+'</span><span>'+r.v+' / '+r.m+'</span></div><div class="bar"><i style="width:'+p+'%;background:'+col+'"></i></div><div class="d">'+esc(r.d)+'</div></div>'}).join('');
-  $('todo').innerHTML=lv.todo.map(function(t){return '<li>'+esc(t)+'</li>'}).join('');
-  saveH(dom.domain,out.tot,lv.t);renderH();
+  $('alert').innerHTML=ev.alerts.length?'<div class="crit"><b>🔴 ALERTA CRÍTICA</b>'+ev.alerts.map(function(x){return '<p>'+esc(x)+'</p>'}).join('')+'<p class="hint" style="color:#7F1D1D">Una alerta crítica pesa más que el puntaje.</p></div>':'';
+  $('rows').innerHTML=ev.cats.filter(function(c){return c.v!==null}).map(function(c){var col=c.v>=70?'#15803D':c.v>=40?'#B45309':'#B91C1C';
+    return '<div class="row"><div class="h"><span>'+c.i+' '+esc(c.n)+'</span><span>'+c.v+' / 100</span></div><div class="bar"><i style="width:'+c.v+'%;background:'+col+'"></i></div>'+c.S.map(sigHTML).join('')+'</div>'}).join('');
+  $('rec').innerHTML='<div class="rec" style="background:'+rc.bg+';border-color:'+rc.c+'"><b style="color:'+rc.c+'">'+rc.t+'</b><p>'+esc(rc.x)+'</p></div>';
+  var chk=ev.S.filter(function(x){return x.e!=='g'});
+  $('payBox').innerHTML='<div class="rec" style="margin-top:10px"><b>'+(chk.length?(rc.lv==='Riesgo alto'?'🔴 NO PAGUES TODAVÍA':'🟡 REVISÁ ESTO ANTES DE PAGAR'):'🟢 TODO EN ORDEN')+'</b><p>'+(chk.length?'Encontramos '+chk.length+' señales que deberías verificar. Tocá cada una para ver qué hacer.':'No hay señales pendientes. Igual, guardá los comprobantes.')+'</p>'+chk.map(sigHTML).join('')+'<p class="hint" style="margin-top:8px">'+ev.cats.map(function(c){var w=c.S.some(function(x){return x.e==='r'})?'🔴':c.S.some(function(x){return x.e==='y'})?'🟡':'🟢';return w+' '+esc(c.n)}).join(' · ')+'</p></div>';
+  $('payBox').classList.add('hidden');$('payBtn').textContent='¿Estás por pagar? Revisá esto';
+  saveH(dom.domain,ev.tot,rc.lv);renderH();
   $('res').scrollIntoView({behavior:'smooth',block:'start'});
   btn.disabled=false;btn.textContent='Calcular puntaje';
 }
+$('payBtn').onclick=function(){var b=$('payBox');b.classList.toggle('hidden');this.textContent=b.classList.contains('hidden')?'¿Estás por pagar? Revisá esto':'Ocultar resumen'};
 $('go').onclick=analizar;
 $('url').onkeydown=function(e){if(e.key==='Enter')analizar()};
 
