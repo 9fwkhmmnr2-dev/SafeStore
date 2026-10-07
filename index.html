@@ -162,19 +162,19 @@ details.how{margin-top:14px;font-size:13px;color:var(--mute)}details.how summary
 <div class="card">
 <h2 style="margin-top:0">Contá tu experiencia</h2>
 <label class="lb" for="eT">Qué pasó</label>
-<select id="eT" class="in"><option value="ok">Compré y salió bien</option><option value="dudosa">Me dejó dudas</option><option value="mala">Tuve problemas</option></select>
+<select id="eT" class="in"><optgroup label="Positivas"><option value="recibido_ok">Recibí el producto correctamente</option><option value="reembolso">Recibí un reembolso</option><option value="positiva">Experiencia positiva</option></optgroup><optgroup label="Neutral"><option value="dudas">Me dejó dudas</option></optgroup><optgroup label="Negativas"><option value="distinto">Producto distinto al publicado</option><option value="nunca_llego">El producto nunca llegó</option><option value="problema_vendedor">Problemas con el vendedor</option><option value="dejo_responder">El vendedor dejó de responder</option><option value="negativa">Experiencia negativa</option></optgroup></select>
 <label class="lb" for="eS">Tienda o @usuario</label>
 <input id="eS" class="in" maxlength="80" placeholder="tienda.com.ar">
 <label class="lb" for="eN">Tu nombre (opcional)</label>
 <input id="eN" class="in" maxlength="40">
 <label class="lb" for="eX">Detalle</label>
-<textarea id="eX" class="in" rows="4" maxlength="600" placeholder="Contá hechos concretos: qué compraste, cuándo, qué pasó."></textarea>
+<textarea id="eX" class="in" rows="4" maxlength="600" placeholder="Contá solo hechos: qué compraste, cuándo, qué pasó. Sin insultos, links, mails ni teléfonos."></textarea>
 <label class="lb" for="eF">Foto (opcional)</label>
 <input type="file" id="eF" accept="image/jpeg,image/png,image/webp">
 <p class="hint">Publicá solo hechos que viviste. Las opiniones son de los usuarios y no representan a Store Verifier.</p>
 <button class="btn" id="pub">Publicar experiencia</button>
 </div>
-<div class="card"><div id="sum"></div><div id="list">Cargando...</div></div>
+<div class="card"><label class="lb" for="qT" style="margin-top:0">Buscá una tienda en la comunidad</label><input id="qT" class="in" placeholder="tienda.com.ar o @tienda" autocomplete="off"><div id="sum" style="margin-top:12px"></div><div id="list">Cargando...</div></div>
 </section>
 </main>
 
@@ -351,21 +351,36 @@ function comDe(dom){
   return{total:f.length,ok:f.filter(function(x){return x.tipo==='ok'}).length,mala:f.filter(function(x){return x.tipo==='mala'}).length};
 }
 var IMG_OK=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/;
+var MOT={recibido_ok:['🟢','Recibí el producto correctamente','ok'],reembolso:['🟢','Recibí un reembolso','ok'],positiva:['🟢','Experiencia positiva','ok'],dudas:['🟡','Me dejó dudas','dudosa'],distinto:['🔴','Producto distinto al publicado','mala'],nunca_llego:['🔴','El producto nunca llegó','mala'],problema_vendedor:['🔴','Problemas con el vendedor','mala'],dejo_responder:['🔴','El vendedor dejó de responder','mala'],negativa:['🔴','Experiencia negativa','mala']};
+var BAD=/\b(hij[oa]s? de (re)?put[ao]s?|hdp|put[ao]s?|mierda|pelotud[ao]s?|forr[ao]s?|conchudo|concha de|sudaca|trolo|marica|retrasad[ao]|mongolic[ao])\b|https?:\/\/|www\.|[\w.-]+@[\w-]+\.[a-z]{2,}|\d{10,}|\d{2,4}[ .-]\d{4}[ .-]\d{4}/i;
+function limpiarQ(q){return (q||'').trim().toLowerCase().replace(/^https?:\/\//,'').replace(/^www\./,'').split('/')[0].replace(/^@/,'').replace(/[%_,()\\]/g,'').slice(0,60)}
+async function comRemote(d){
+  var n=limpiarQ(d);if(!sb||!n)return comDe(d);
+  try{var r=await sb.from('experiencias').select('tipo').ilike('tienda','%'+n+'%').limit(300);
+    if(r.error)return comDe(d);
+    var t=r.data||[];return{total:t.length,ok:t.filter(function(x){return x.tipo==='ok'}).length,mala:t.filter(function(x){return x.tipo==='mala'}).length}
+  }catch(e){return comDe(d)}
+}
 async function cargar(){
-  var r=await sb.from('experiencias').select('*').order('id',{ascending:false}).limit(80);
+  if(!sb)return;
+  var q=limpiarQ($('qT').value);
+  var qq=sb.from('experiencias').select('*').order('id',{ascending:false}).limit(80);
+  if(q)qq=qq.ilike('tienda','%'+q+'%');
+  var r=await qq;
   if(r.error){$('list').textContent='No se pudieron cargar las experiencias.';return}
   exps=r.data||[];
   var ok=exps.filter(function(x){return x.tipo==='ok'}).length,du=exps.filter(function(x){return x.tipo==='dudosa'}).length,ma=exps.filter(function(x){return x.tipo==='mala'}).length;
-  $('sum').innerHTML='<b>Resumen de la comunidad</b><p class="hint">'+ok+' buenas · '+du+' dudosas · '+ma+' con problemas</p>';
-  if(!exps.length){$('list').innerHTML='<p class="hint">Todavía no hay experiencias. Sé el primero en contar la tuya.</p>';return}
+  $('sum').innerHTML='<b>'+(q?'Resultados para "'+esc(q)+'"':'Últimas experiencias')+'</b><p class="hint">'+exps.length+' experiencias · 🟢 '+ok+' positivas · 🟡 '+du+' neutrales · 🔴 '+ma+' negativas</p>';
+  if(!exps.length){$('list').innerHTML='<p class="hint">'+(q?'No encontramos experiencias de esa tienda. Sé el primero en contar la tuya.':'Todavía no hay experiencias.')+'</p>';return}
   $('list').innerHTML=exps.map(function(d){
-    var ic=d.tipo==='ok'?'🟢':d.tipo==='mala'?'🔴':'🟡';
+    var m=MOT[d.motivo],ic=m?m[0]:(d.tipo==='ok'?'🟢':d.tipo==='mala'?'🔴':'🟡');
     var img=(typeof d.foto==='string'&&IMG_OK.test(d.foto))?'<img src="'+d.foto+'" alt="Foto adjunta" loading="lazy">':'';
-    var del='';
+    var fecha=d.created_at?new Date(d.created_at).toLocaleDateString('es-AR'):'';
     var rep='<a href="mailto:esberreta@gmail.com?subject='+encodeURIComponent('Reportar contenido #'+d.id)+'">Reportar contenido</a>';
-    return '<div class="exp"><b>'+ic+' '+esc(d.tienda)+'</b><div style="margin-top:6px">'+esc(d.texto)+'</div>'+img+'<div class="m">'+rep+del+'</div></div>';
+    return '<div class="exp"><b>'+ic+' '+esc(d.tienda)+'</b>'+(m?'<div class="hint">'+esc(m[1])+'</div>':'')+'<div style="margin-top:6px">'+esc(d.texto)+'</div>'+img+'<div class="m"><span>'+esc(fecha)+'</span>'+rep+'</div></div>';
   }).join('');
 }
+var qt;$('qT').oninput=function(){clearTimeout(qt);qt=setTimeout(cargar,350)};
 // Comprime la foto a máx. 800px JPEG para no llenar la base
 function comprimir(file){return new Promise(function(res,rej){
   var img=new Image(),u=URL.createObjectURL(file);
@@ -378,11 +393,12 @@ $('pub').onclick=async function(){
   if(Date.now()-last<60000){alert('Esperá un minuto antes de publicar otra experiencia.');return}
   var tienda=$('eS').value.trim(),texto=$('eX').value.trim();
   if(!tienda||texto.length<15){alert('Completá la tienda y contá qué pasó (mínimo 15 caracteres).');return}
+  if(BAD.test(texto+' '+$('eN').value)){alert('Tu mensaje tiene lenguaje ofensivo, links, mails o teléfonos. Reescribilo contando solo los hechos.');return}
   var b=this;b.disabled=true;b.textContent='Publicando...';
   var foto=null,file=$('eF').files[0];
   try{if(file){if(!/^image\/(jpeg|png|webp)$/.test(file.type))throw 'tipo';foto=await comprimir(file)}}
   catch(e){alert('La foto no es válida. Usá JPG, PNG o WebP.');b.disabled=false;b.textContent='Publicar experiencia';return}
-  var r=await sb.from('experiencias').insert([{nombre:$('eN').value.trim().slice(0,40)||'Anónimo',tienda:tienda.slice(0,80),texto:texto.slice(0,600),foto:foto,tipo:$('eT').value}]).select();
+  var r=await sb.from('experiencias').insert([{nombre:$('eN').value.trim().slice(0,40)||'Anónimo',tienda:tienda.slice(0,80),texto:texto.slice(0,600),foto:foto,tipo:MOT[$('eT').value][2],motivo:$('eT').value}]).select();
   if(r.error)alert('No se pudo publicar: '+r.error.message);
   else{var id=r.data&&r.data[0]&&r.data[0].id;if(id){mine.push(id);localStorage.setItem('sv_mine',JSON.stringify(mine))}localStorage.setItem('sv_last',Date.now());$('eS').value='';$('eX').value='';$('eF').value='';cargar()}
   b.disabled=false;b.textContent='Publicar experiencia';
@@ -411,7 +427,8 @@ async function analizar(){
   await new Promise(function(r){setTimeout(r,300)});
   $('scan').classList.add('hidden');
   var risk={},pos={};['c1','c2','c3','c4','c5'].forEach(function(i){risk[i]=$(i).checked});['c6','c7','c8'].forEach(function(i){pos[i]=$(i).checked});
-  var ev=evaluar(dom,web?all[0]:null,web?all[1]:null,web?all[2]:null,web?all[3]:null,cuit,risk,pos,comDe(dom.domain)),rc=recom(ev);
+  var com=await comRemote(dom.domain);
+  var ev=evaluar(dom,web?all[0]:null,web?all[1]:null,web?all[2]:null,web?all[3]:null,cuit,risk,pos,com),rc=recom(ev);
   $('res').style.display='block';
   $('num').style.color=rc.c;
   var arc=$('arc'),end=352-352*ev.tot/100;arc.style.stroke=rc.c;arc.style.transition='none';arc.style.strokeDashoffset=352;arc.getBoundingClientRect();
