@@ -184,7 +184,7 @@ details.how{margin-top:14px;font-size:13px;color:var(--mute)}details.how summary
 
 <script>
 var BACKEND_URL=''; // Etapa 2: acá va la URL de tu backend de antigüedad .com.ar (ver nota)
-var SB_URL='https://ltaghuumilyjdzpmatqj.supabase.co', SB_KEY='sb_publishable_KXmx7LEqpZ3g5u-iRMeyDA__bWJBbqH';
+var SB_URL='https://tqcbtzemivkfcafqbroi.supabase.co', SB_KEY='sb_publishable_R8D9jslJkSQt1PkwIPc4Tg_tCLQSNx2';
 var $=function(i){return document.getElementById(i)};
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
@@ -361,18 +361,11 @@ async function cargar(){
   $('list').innerHTML=exps.map(function(d){
     var ic=d.tipo==='ok'?'🟢':d.tipo==='mala'?'🔴':'🟡';
     var img=(typeof d.foto==='string'&&IMG_OK.test(d.foto))?'<img src="'+d.foto+'" alt="Foto adjunta" loading="lazy">':'';
-    var del=mine.indexOf(d.id)!==-1?'<button data-del="'+Number(d.id)+'">Borrar mi reporte</button>':'';
+    var del='';
     var rep='<a href="mailto:esberreta@gmail.com?subject='+encodeURIComponent('Reportar contenido #'+d.id)+'">Reportar contenido</a>';
     return '<div class="exp"><b>'+ic+' '+esc(d.tienda)+'</b><div style="margin-top:6px">'+esc(d.texto)+'</div>'+img+'<div class="m">'+rep+del+'</div></div>';
   }).join('');
 }
-$('list').onclick=async function(e){
-  var id=e.target.getAttribute&&e.target.getAttribute('data-del');if(!id||!sb)return;
-  if(!confirm('¿Borrar tu reporte?'))return;
-  var r=await sb.from('experiencias').delete().eq('id',Number(id));
-  if(r.error){alert('No se pudo borrar.');return}
-  mine=mine.filter(function(x){return x!==Number(id)});localStorage.setItem('sv_mine',JSON.stringify(mine));cargar();
-};
 // Comprime la foto a máx. 800px JPEG para no llenar la base
 function comprimir(file){return new Promise(function(res,rej){
   var img=new Image(),u=URL.createObjectURL(file);
